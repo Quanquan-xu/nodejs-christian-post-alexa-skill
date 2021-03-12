@@ -1,0 +1,451 @@
+{
+    "interactionModel": {
+        "languageModel": {
+            "invocationName": "my edifi",
+            "intents": [
+                {
+                    "name": "AMAZON.CancelIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.HelpIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.StopIntent",
+                    "samples": []
+                },
+                {
+                    "name": "PlayPodcast",
+                    "slots": [],
+                    "samples": [
+                        "begin podcast",
+                        "begin the podcast",
+                        "begin playing the podcast",
+                        "start podcast",
+                        "start the podcast",
+                        "start playing the podcast",
+                        "play the podcast",
+                        "to play",
+                        "to begin podcast",
+                        "to begin the podcast",
+                        "to begin playing the podcast",
+                        "to start podcast",
+                        "to start the podcast",
+                        "to start playing the podcast",
+                        "to play the podcast"
+                    ]
+                },
+                {
+                    "name": "PlayChannel",
+                    "slots": [
+                        {
+                            "name": "number",
+                            "type": "AMAZON.NUMBER",
+                            "samples": [
+                                "channels {number}",
+                                "channel {number}",
+                                "{number}"
+                            ]
+                        }
+                    ],
+                    "samples": [
+                        "play channels",
+                        "play channel",
+                        "channels",
+                        "channel",
+                        "channels {number}",
+                        "channel {number}",
+                        "play channels {number}",
+                        "play channel {number}",
+                        "begin channels {number}",
+                        "begin channel {number}",
+                        "start channels {number}",
+                        "start channel {number}"
+                    ]
+                },
+                {
+                    "name": "PlayEpisode",
+                    "slots": [
+                        {
+                            "name": "number",
+                            "type": "AMAZON.NUMBER",
+                            "samples": [
+                                "episodes {number}",
+                                "episode {number}",
+                                "{number}"
+                            ]
+                        }
+                    ],
+                    "samples": [
+                        "{number}",
+                        "playlist {number}",
+                        "play episodes",
+                        "episodes",
+                        "play episode",
+                        "episode",
+                        "episodes {number}",
+                        "episode {number}",
+                        "play episodes {number}",
+                        "play episode {number}",
+                        "begin episodes {number}",
+                        "begin episode {number}",
+                        "start episodes {number}",
+                        "start episode {number}"
+                    ]
+                },
+                {
+                    "name": "PlayLastestEpisodes",
+                    "slots": [
+                        {
+                            "name": "channel",
+                            "type": "AMAZON.BroadcastChannel"
+                        },
+                        {
+                            "name": "pastor",
+                            "type": "AMAZON.Author"
+                        }
+                    ],
+                    "samples": [
+                        "lastest episodes",
+                        "lastest episode",
+                        "lastest episode of pastor {pastor}",
+                        "lastest audio of pastor {pastor}",
+                        "lastest sermon of pastor {pastor}",
+                        "lastest episode of pastor {pastor} channel ",
+                        "pastor {pastor} lastest episode",
+                        "pastor {pastor} lastest audio",
+                        "pastor {pastor} lastest sermon",
+                        "pastor {pastor} channel lastest episode",
+                        "lastest episode of {channel} channel",
+                        "lastest episode of channel {channel}",
+                        "{channel} channel lastest episode",
+                        "channel {channel} lastest episode"
+                    ]
+                },
+                {
+                    "name": "PlayList",
+                    "slots": [
+                        {
+                            "name": "channel",
+                            "type": "AMAZON.BroadcastChannel"
+                        },
+                        {
+                            "name": "pastor",
+                            "type": "AMAZON.Author"
+                        }
+                    ],
+                    "samples": [
+                        "start pastor {pastor} episodes list",
+                        "start pastor {pastor} audios list",
+                        "start pastor {pastor} sermon list",
+                        "start pastor {pastor} channel list",
+                        "play pastor {pastor} episodes list",
+                        "play pastor {pastor} audios list",
+                        "play pastor {pastor} sermon list",
+                        "play pastor {pastor} channel list",
+                        "pastor {pastor} episodes list",
+                        "pastor {pastor} audios list",
+                        "pastor {pastor} sermon list",
+                        "pastor {pastor} channel list",
+                        "list pastor {pastor} episodes",
+                        "list pastor {pastor} audios",
+                        "list pastor {pastor} sermons",
+                        "list pastor {pastor} channel",
+                        "start {channel} channel list",
+                        "start channel {channel} list",
+                        "play {channel} channel list",
+                        "play channel {channel} list",
+                        "list {channel} channel",
+                        "list channel {channel}",
+                        "{channel} channel list",
+                        "channel {channel} list"
+                    ]
+                },
+                {
+                    "name": "SayList",
+                    "slots": [
+                        {
+                            "name": "queryName",
+                            "type": "queryLists",
+                            "samples": [
+                                "{queryName} list",
+                                "list {queryName}",
+                                "{queryName}"
+                            ]
+                        }
+                    ],
+                    "samples": [
+                        "list my {queryName}",
+                        "my {queryName}",
+                        "{queryName} playlist",
+                        "playlist",
+                        "list",
+                        "list {queryName}",
+                        "{queryName} list"
+                    ]
+                },
+                {
+                    "name": "AMAZON.NavigateHomeIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.FallbackIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.PauseIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.ResumeIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.LoopOffIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.LoopOnIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.NextIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.NoIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.ShuffleOffIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.ShuffleOnIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.YesIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.StartOverIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.PreviousIntent",
+                    "samples": []
+                }
+            ],
+            "types": [
+                {
+                    "name": "queryLists",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "playlist"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "lastest episodes"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "lastest episode"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "episodes"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "episode"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "channels"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "channel"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        "dialog": {
+            "intents": [
+                {
+                    "name": "SayList",
+                    "confirmationRequired": false,
+                    "prompts": {},
+                    "slots": [
+                        {
+                            "name": "queryName",
+                            "type": "queryLists",
+                            "confirmationRequired": false,
+                            "elicitationRequired": true,
+                            "prompts": {
+                                "elicitation": "Elicit.Slot.1449669025730.580795379810"
+                            },
+                            "validations": [
+                                {
+                                    "type": "hasEntityResolutionMatch",
+                                    "prompt": "Slot.Validation.796415954714.1115863610978.709264952775"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "PlayChannel",
+                    "confirmationRequired": false,
+                    "prompts": {},
+                    "slots": [
+                        {
+                            "name": "number",
+                            "type": "AMAZON.NUMBER",
+                            "confirmationRequired": false,
+                            "elicitationRequired": true,
+                            "prompts": {
+                                "elicitation": "Elicit.Slot.613306065882.898154223295"
+                            },
+                            "validations": [
+                                {
+                                    "type": "isLessThanOrEqualTo",
+                                    "prompt": "Slot.Validation.613306065882.898154223295.1298312860522",
+                                    "value": "10"
+                                },
+                                {
+                                    "type": "isGreaterThanOrEqualTo",
+                                    "prompt": "Slot.Validation.613306065882.898154223295.714310095373",
+                                    "value": "1"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "PlayEpisode",
+                    "confirmationRequired": false,
+                    "prompts": {},
+                    "slots": [
+                        {
+                            "name": "number",
+                            "type": "AMAZON.NUMBER",
+                            "confirmationRequired": false,
+                            "elicitationRequired": true,
+                            "prompts": {
+                                "elicitation": "Elicit.Slot.1445133829469.597661796949"
+                            },
+                            "validations": [
+                                {
+                                    "type": "isLessThanOrEqualTo",
+                                    "prompt": "Slot.Validation.1445133829469.597661796949.1120955677790",
+                                    "value": "10"
+                                },
+                                {
+                                    "type": "isGreaterThanOrEqualTo",
+                                    "prompt": "Slot.Validation.1445133829469.597661796949.1086497678439",
+                                    "value": "1"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "delegationStrategy": "ALWAYS"
+        },
+        "prompts": [
+            {
+                "id": "Elicit.Slot.1449669025730.580795379810",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "channels, lastest episodes, my playlist, which one do you want check list?"
+                    }
+                ]
+            },
+            {
+                "id": "Confirm.Slot.796415954714.1115863610978",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "hello"
+                    }
+                ]
+            },
+            {
+                "id": "Slot.Validation.796415954714.1115863610978.709264952775",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "Sorry, only value 'channels' ,  'lastest episodes'  and 'my playlist' is acceptable , which one do you want check list?"
+                    }
+                ]
+            },
+            {
+                "id": "Elicit.Slot.613306065882.898154223295",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "Which channel number do you want to play, if you're not sure what to do next try asking for help "
+                    }
+                ]
+            },
+            {
+                "id": "Slot.Validation.613306065882.898154223295.1298312860522",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "An acceptable value is from one to ten, which channel number do you want to start to play?"
+                    }
+                ]
+            },
+            {
+                "id": "Slot.Validation.613306065882.898154223295.714310095373",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "An acceptable value is from one to ten, which channel number do you want to start to play?"
+                    }
+                ]
+            },
+            {
+                "id": "Elicit.Slot.1445133829469.597661796949",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "Which episode number do you want to play, if you're not sure what to do next try asking for help "
+                    }
+                ]
+            },
+            {
+                "id": "Slot.Validation.1445133829469.597661796949.1120955677790",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "An acceptable value is from one to ten, which episode number do you want to start to play?"
+                    }
+                ]
+            },
+            {
+                "id": "Slot.Validation.1445133829469.597661796949.1086497678439",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "An acceptable value is from one to ten, which episode number do you want to start to play?"
+                    }
+                ]
+            }
+        ]
+    }
+}
