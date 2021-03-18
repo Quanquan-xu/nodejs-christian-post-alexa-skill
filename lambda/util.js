@@ -78,9 +78,152 @@ module.exports = {
         const {supportedInterfaces} = handlerInput.requestEnvelope.context.System.device;
         return !!supportedInterfaces['Alexa.Presentation.APL'];
     },
-    async getPlaybackInfo(handlerInput) {
-      const attributes = await handlerInput.attributesManager.getPersistentAttributes() || {};
-      console.log('Loading from persistent storage: ' + JSON.stringify(attributes));
-      return attributes.playbackInfo;
+    speakSafeText: function(input) {
+        if (input && (input.includes("&") || input.includes("<") || input.includes(">"))) {
+            return input.toString().replace(/&#39;/g, "'").replace(/&/g, 'and').replace(/</g,"'").replace(/>/g,"'");
+        }
+        return input;
+    },
+    getSayChannelsMessages(channels, handlerInput, isFromSearch=false, notFirstTime=true){
+        let message, cardTitle, cardSubtitle;
+        const length = channels.length;
+        const maxLength = length >= 10 ? 10 : length;
+        const number = (Math.floor(Math.random() * maxLength) + 1);
+        const isNotificationFrist = (number >= maxLength -3);
+
+        if(isFromSearch){
+            message = handlerInput.t('LIST_RESULTS_NOTIFICATION_MSG_HEADER_FRO_SEARCH',{length:maxLength, name:"channels", last: notFirstTime ? " last ":" "});
+        }else{
+            message = handlerInput.t('LIST_RECOMMANDED_CHANNELS_NOTIFICATION_MSG_HEADER',{length:maxLength});
+        }
+
+        cardTitle = ''
+        channels.forEach(function(channel, index) {
+            cardTitle += 'Channel ' + (index + 1) + " : " + channel.title + ";  "
+        });
+        cardSubtitle = handlerInput.t('LIST_PROMPT_NOTIFICATION_MSG',{name:"channel", number:number});
+      
+        if(isNotificationFrist){
+            message += cardSubtitle;
+        }
+
+        message += cardTitle;
+        if(!isNotificationFrist){
+            message += cardSubtitle;
+        }
+
+        return {message, cardTitle, cardSubtitle}
+    },
+    getSayPlaylistMessages(playlist,handlerInput){
+        let message, cardTitle, cardSubtitle; 
+        const episodes = playlist['episodes'];
+        const length = Object.keys(episodes).length;
+        const maxLength = length >= 10 ? 10 : length;
+        const number = (Math.floor(Math.random() * maxLength) + 1);
+        const isNotificationFrist = (number >= maxLength - 3);
+
+        message = '';
+        cardTitle = ''
+        cardSubtitle = handlerInput.t('LIST_PROMPT_NOTIFICATION_MSG',{name:"episode", number:number});
+
+        if(playlist['type'] === 'channel'){
+            message = handlerInput.t('LIST_PLAYLIST_NOTIFICATION_MSG_HEADER_FRO_CHANNEL', {length:maxLength, name:playlist['name']})
+            Object.values(episodes).forEach(function(episode, index) {
+                cardTitle += 'Episode ' + (index + 1) + " : " + episode.title + ";  "
+            });
+        }else{
+            if(playlist['name'].includes("promotion")){
+                message = handlerInput.t('LIST_PLAYLIST_NOTIFICATION_MSG_HEADER_FRO_PROMOTION', {length:maxLength})
+                Object.values(episodes).forEach(function(episode, index) {
+                    cardTitle += 'Episode ' + (index + 1) + " : " + episode.title + ";  "
+                });
+            }else if (playlist['name'].includes("search")) {
+                message = handlerInput.t('LIST_RESULTS_NOTIFICATION_MSG_HEADER_FRO_SEARCH',{length:maxLength, name:"episodes"});
+                Object.values(episodes).forEach(function(episode, index) {
+                    cardTitle += 'Episode ' + (index + 1) + " : " + episode.title + " from channel " + episode.channelName +";  "
+                });
+            }else{
+                message = handlerInput.t('LIST_PLAYLIST_NOTIFICATION_MSG_HEADER_FRO_EPISODES', {length:maxLength})
+                Object.values(episodes).forEach(function(episode, index) {
+                    cardTitle += 'Episode ' + (index + 1) + " : " + episode.title + ";  "
+                });
+            }
+        }
+        
+        if(isNotificationFrist){
+            message += cardSubtitle;
+        }
+        if(maxLength > 5){
+            message += handlerInput.t('LIST_ONLY_TOP_FIVE_NOTIFICATION_MSG',{name:""});
+        }
+        if(playlist['type'] === 'episode' && playlist['name'].includes("search")){
+            Object.values(episodes).filter( (ele,index) => index < 5 ).forEach(function(episode, index) {
+                message += 'Episode ' + (index + 1) + " : " + episode.title + " from channel " + episode.channelName +";  "
+            });
+        }else{
+            Object.values(episodes).filter( (ele,index) => index < 5 ).forEach(function(episode, index) {
+                message += 'Episode ' + (index + 1) + " : " + episode.title + ";  "
+            });
+        }
+   
+        if(!isNotificationFrist){
+            message += cardSubtitle;
+        }
+        return {message, cardTitle, cardSubtitle}
+    },
+    getSayPromotionEpisodesMessages(episodes,playlist,handlerInput){
+        let message, cardTitle, cardSubtitle; 
+        const length = Object.keys(episodes).length;
+        const maxLength = length >= 10 ? 10 : length;
+        const number = (Math.floor(Math.random() * maxLength) + 1);
+        const isNotificationFrist = (number >= maxLength - 3);
+
+        message = '';
+        cardTitle = '';
+        Object.values(episodes).forEach(function(episode, index) {
+          cardTitle += 'Episode ' + (index + 1) + " : " + episode.title + ";  "
+        });
+        cardSubtitle = handlerInput.t('LIST_PROMPT_NOTIFICATION_MSG',{name:"episode", number:number});
+        
+        if(playlist['type'] === 'channel'){
+          message = handlerInput.t('LIST_PROMOTION_EPISODES_NOTIFICATION_MSG_FOR_CHANNEL')
+        }else{
+          message = handlerInput.t('LIST_PROMOTION_EPISODES_NOTIFICATION_MSG_FOR_EPISODES')
+          if(isNotificationFrist){
+              message += cardSubtitle;
+          }
+        }
+        if(maxLength > 5){
+            message += handlerInput.t('LIST_ONLY_TOP_FIVE_NOTIFICATION_MSG',{name:"lastest promotion episodes"});
+        }
+        Object.values(episodes).filter( (ele,index) => index < 5 ).forEach(function(episode, index) {
+          message += 'Episode ' + (index + 1) + " : " + episode.title + ";  "
+        });
+        if(!isNotificationFrist && playlist['type'] !== 'channel'){
+            message += cardSubtitle;
+        }
+        return {message, cardTitle, cardSubtitle}
+    },
+    setPlaylist(type,name,episodes,sessionAttributes){
+        const playlist = {type,name,episodes}
+        const playlistTokens = Object.keys(episodes);
+        
+        sessionAttributes['playlist'] = playlist;
+        sessionAttributes['playlistTokens'] = playlistTokens;
+        sessionAttributes['playlistLength'] = playlistTokens.length;
+        
+        return {playlist, playlistTokens}
+    },
+    async getPersistentAttributes(handlerInput){
+        const persistentAttributes = await handlerInput.attributesManager.getPersistentAttributes();
+        const {
+            playbackInfo,
+            playbackSetting,
+            playlist,
+            playlistTokens,
+            playlistLength,
+            sessionCounter
+        } = persistentAttributes;
+        return {persistentAttributes, playbackInfo,playbackSetting,playlistTokens, playlistLength, playlist,sessionCounter}
     }
 }

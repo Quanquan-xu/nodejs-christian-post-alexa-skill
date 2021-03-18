@@ -13,27 +13,36 @@ const LaunchRequestHandler = {
     return Alexa.getRequestType(handlerInput.requestEnvelope) === 'LaunchRequest';
   },
   async handle(handlerInput) {
-   const playbackInfo = await util.getPlaybackInfo(handlerInput);
+    const {playbackInfo,playlistTokens,playlist} = handlerInput.attributesManager.getSessionAttributes();
     let message;
     let reprompt;
 
     if (!playbackInfo.hasPreviousPlaybackSession) {
       message = handlerInput.t('WELCOME_MSG');
       reprompt = handlerInput.t('WELCOME_MSG_REPROMPT');
+      
     } else {
       playbackInfo.inPlaybackSession = false;
-      message = handlerInput.t('WELCOME_BACK_MSG', {description: constants.audioData[playbackInfo.playOrder[playbackInfo.index]].title})
+      let description;
+      const episodes = playlist['episodes'];
+      const episode = episodes[playlistTokens[playbackInfo.index]]
+      if(playlist['type']==="channel"){
+        description = episode.title + ' from channel ' + playlist['name']
+      }else{
+        description = episode.title + ' from ' + playlist['name']
+      }
+      message = handlerInput.t('WELCOME_BACK_MSG', {description:description})
       reprompt = handlerInput.t('WELCOME_BACK_MSG_REPROMPT');
     }
     handlerInput.responseBuilder.withStandardCard(
-        message,
+        util.speakSafeText(message),
         reprompt,
-        constants.images.standardCardSmallImageUrl,
-        constants.images.standardCardLargeImageUrl
-        );
+        constants.IMAGES.standardCardSmallImageUrl,
+        constants.IMAGES.standardCardLargeImageUrl
+    );
 
     return handlerInput.responseBuilder
-      .speak(message)
+      .speak(util.speakSafeText(message))
       .reprompt(reprompt)
       .getResponse();
   },
@@ -84,13 +93,10 @@ const IntentReflectorHandler = {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest';
     },
     handle(handlerInput) {
-        const intentName = Alexa.getIntentName(handlerInput.requestEnvelope);
-        const speechText = handlerInput.t('REFLECTOR_MSG', {intent: intentName});
-
         return handlerInput.responseBuilder
-            .speak(speechText)
-            //.reprompt('add a reprompt if you want to keep the session open for the user to respond')
-            .getResponse();
+        .speak(handlerInput.t('REPROMPT_MSG'))
+        .reprompt(handlerInput.t('REPROMPT_MSG'))
+        .getResponse();
     }
 };
 /**
@@ -108,7 +114,7 @@ const ErrorHandler = {
         console.log(`~~~~ Error handled: ${JSON.stringify(error)}`);
 
         return handlerInput.responseBuilder
-            .speak(speechText)
+            .speak(error.toString())
             .reprompt(handlerInput.t('REPROMPT_MSG'))
             .getResponse();
     }

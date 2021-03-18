@@ -42,45 +42,66 @@ const LocalisationRequestInterceptor = {
     }
 };
 
-/* *
- * Below we use async and await ( more info: javascript.info/async-await )
- * It's a way to wrap promises and waait for the result of an external async operation
- * Like getting and saving the persistent attributes
- * */
-const LoadPersistentAttributesRequestInterceptor = {
-  async process(handlerInput) {
-    // const playlist = Object.values(eposides)
-    // Check if user is invoking the skill the first time and initialize preset values
-    const {attributesManager, requestEnvelope} = handlerInput;
-    const persistentAttributes = await attributesManager.getPersistentAttributes();
-    const sessionAttributes = attributesManager.getSessionAttributes();
-    // the "loaded" check is because the "new" session flag is lost if there's a one shot utterance that hits an intent with auto-delegate
-    let playlist;
-    if (Alexa.isNewSession(requestEnvelope) || !sessionAttributes['loaded']){ //is this a new session? not loaded from db?
-        playlist = await logic.fetchLastestEposides(attributesManager);
-    }else{
-        playlist = sessionAttributes["playlist"]
-    }
 
-    if (Object.keys(persistentAttributes).length === 0) {
-      handlerInput.attributesManager.setPersistentAttributes({
-        playbackSetting: {
-          loop: false,
-          shuffle: false,
-        },
-        playbackInfo: {
-          playOrder: [],
-          index: 0,
-          offsetInMilliseconds: 0,
-          playbackIndexChanged: true,
-          token: '',
-          nextStreamEnqueued: false,
-          inPlaybackSession: false,
-          hasPreviousPlaybackSession: false,
+const LoadAttributesRequestInterceptor = {
+    async process(handlerInput) {
+        const {attributesManager, requestEnvelope} = handlerInput;
+        const sessionAttributes = attributesManager.getSessionAttributes();
+        // the "loaded" check is because the "new" session flag is lost if there's a one shot utterance that hits an intent with auto-delegate
+        if (Alexa.isNewSession(requestEnvelope) || !sessionAttributes['loaded']){ //is this a new session? not loaded from db?
+            let persistentAttributes = await attributesManager.getPersistentAttributes() || {};
+            if (Object.keys(persistentAttributes).length === 0) {
+                persistentAttributes = {
+                  playbackSetting: {
+                    loop: false,
+                    shuffle: false,
+                  },
+                  playbackInfo: {
+                    index: 0,
+                    offsetInMilliseconds: 0,
+                    playbackIndexChanged: true,
+                    token: '',
+                    nextStreamEnqueued: false,
+                    inPlaybackSession: true,
+                    hasPreviousPlaybackSession: false,
+                  }
+                }
+            }
+            if(!persistentAttributes['updatedAt'] || persistentAttributes['updatedAt'] < ( Date.now() - 4 * 1000 * 3600)){
+              const newSessionAttributes = await logic.fetchLastestEposides(persistentAttributes['playlist']);
+              persistentAttributes = Object.assign(persistentAttributes, newSessionAttributes)
+
+            }
+            console.log('Loading from persistent storage: ' + JSON.stringify(persistentAttributes));
+            persistentAttributes['loaded'] = true;
+            //copy persistent attribute to session attributes
+            attributesManager.setSessionAttributes(persistentAttributes); // ALL persistent attributtes are now session attributes
         }
-      });
     }
-  },
+};
+
+// If you disable the skill and reenable it the userId might change and you loose the persistent attributes saved below as userId is the primary key
+const SaveAttributesResponseInterceptor = {
+    async process(handlerInput, response) {
+        if (!response) return; // avoid intercepting calls that have no outgoing response due to errors
+        const {attributesManager, requestEnvelope} = handlerInput;
+        const sessionAttributes = attributesManager.getSessionAttributes();
+        const shouldEndSession = (typeof response.shouldEndSession === "undefined" ? true : response.shouldEndSession); //is this a session end?
+        // the "loaded" check is because the session "new" flag is lost if there's a one shot utterance that hits an intent with auto-delegate
+        const loadedThisSession = sessionAttributes['loaded'];
+        if ((shouldEndSession || Alexa.getRequestType(requestEnvelope) === 'SessionEndedRequest') && loadedThisSession) { // skill was stopped or timed out
+            // we increment a persistent session counter here
+            sessionAttributes['sessionCounter'] = sessionAttributes['sessionCounter'] ? sessionAttributes['sessionCounter'] + 1 : 1;
+            // limiting save of session attributes to the ones we want to make persistent
+            for (var key in sessionAttributes) {
+                if (!constants.PERSISTENT_ATTRIBUTES_NAMES.includes(key))
+                    delete sessionAttributes[key];
+                }
+            console.log('Saving to persistent storage:' + JSON.stringify(sessionAttributes));
+            attributesManager.setPersistentAttributes(sessionAttributes);
+            await attributesManager.savePersistentAttributes();
+        }
+    }
 };
 
 const SavePersistentAttributesResponseInterceptor = {
@@ -89,11 +110,11 @@ const SavePersistentAttributesResponseInterceptor = {
   },
 };
 
-
 module.exports = {
     LoggingRequestInterceptor,
     LoggingResponseInterceptor,
     LocalisationRequestInterceptor,
-    LoadPersistentAttributesRequestInterceptor,
+    LoadAttributesRequestInterceptor,
+    SaveAttributesResponseInterceptor,
     SavePersistentAttributesResponseInterceptor
 }

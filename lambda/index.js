@@ -15,12 +15,14 @@ const skillBuilder = Alexa.SkillBuilders.custom();
 exports.handler = skillBuilder
   .addRequestHandlers(
     audioPlayerHandlers.CheckAudioInterfaceHandler,
-    audioPlayerHandlers.SayListIntentHandler,
-    audioPlayerHandlers.PlayChannelIntentHandler,
     normalHandlers.LaunchRequestHandler,
+    audioPlayerHandlers.SayListIntentHandler,
+    audioPlayerHandlers.SayRecommendedChannelsHandler,
+    audioPlayerHandlers.SaySearchResultIntentHandler,
+    audioPlayerHandlers.PlayChannelIntentHandler,
+    audioPlayerHandlers.PlayEpisodeIntentHandler,
+    audioPlayerHandlers.PlayPromotionEpisodesIntentHandler,
     audioPlayerHandlers.HelpHandler,
-    normalHandlers.SystemExceptionHandler,
-    normalHandlers.SessionEndedRequestHandler,
     audioPlayerHandlers.YesHandler,
     audioPlayerHandlers.NoHandler,
     audioPlayerHandlers.StartPlaybackHandler,
@@ -32,19 +34,21 @@ exports.handler = skillBuilder
     audioPlayerHandlers.ShuffleOnHandler,
     audioPlayerHandlers.ShuffleOffHandler,
     audioPlayerHandlers.StartOverHandler,
-    normalHandlers.ExitHandler,
+    audioPlayerHandlers.ExitHandler,
     audioPlayerHandlers.AudioPlayerEventHandler,
-    audioPlayerHandlers.CancelAndStopIntentHandler,
+    normalHandlers.SessionEndedRequestHandler,
+    normalHandlers.SystemExceptionHandler,
     normalHandlers.FallbackIntentHandler,
     normalHandlers.IntentReflectorHandler
   )
   .addRequestInterceptors(
-    interceptors.LoadPersistentAttributesRequestInterceptor,
+    interceptors.LoadAttributesRequestInterceptor,
     interceptors.LocalisationRequestInterceptor,
     interceptors.LoggingRequestInterceptor
   )
   .addResponseInterceptors(
     interceptors.LoggingResponseInterceptor,
+    interceptors.SaveAttributesResponseInterceptor,
     interceptors.SavePersistentAttributesResponseInterceptor
   )
   .withPersistenceAdapter(util.getPersistenceAdapter())
