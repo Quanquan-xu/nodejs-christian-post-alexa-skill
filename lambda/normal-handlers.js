@@ -18,9 +18,9 @@ const LaunchRequestHandler = {
     let reprompt;
 
     if (!playbackInfo.hasPreviousPlaybackSession) {
-      message = handlerInput.t('WELCOME_MSG');
-      reprompt = handlerInput.t('WELCOME_MSG_REPROMPT');
-      
+      message = util.getResponseMessage('WELCOME_MSG');
+      reprompt = util.getResponseMessage('WELCOME_MSG_REPROMPT');
+
     } else {
       playbackInfo.inPlaybackSession = false;
       let description;
@@ -31,8 +31,8 @@ const LaunchRequestHandler = {
       }else{
         description = episode.title + ' from ' + playlist['name']
       }
-      message = handlerInput.t('WELCOME_BACK_MSG', {description:description})
-      reprompt = handlerInput.t('WELCOME_BACK_MSG_REPROMPT');
+      message = util.getResponseMessage('WELCOME_BACK_MSG', {description:description})
+      reprompt = util.getResponseMessage('WELCOME_BACK_MSG_REPROMPT');
     }
     handlerInput.responseBuilder.withStandardCard(
         util.speakSafeText(message),
@@ -59,11 +59,11 @@ const FallbackIntentHandler = {
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.FallbackIntent';
     },
     handle(handlerInput) {
-        const speechText = handlerInput.t('FALLBACK_MSG');
+        const speechText = util.getResponseMessage('FALLBACK_MSG');
 
         return handlerInput.responseBuilder
             .speak(speechText)
-            .reprompt(handlerInput.t('REPROMPT_MSG'))
+            .reprompt(util.getResponseMessage('REPROMPT_MSG'))
             .getResponse();
     }
 };
@@ -94,8 +94,8 @@ const IntentReflectorHandler = {
     },
     handle(handlerInput) {
         return handlerInput.responseBuilder
-        .speak(handlerInput.t('REPROMPT_MSG'))
-        .reprompt(handlerInput.t('REPROMPT_MSG'))
+        .speak(util.getResponseMessage('REPROMPT_MSG'))
+        .reprompt(util.getResponseMessage('REPROMPT_MSG'))
         .getResponse();
     }
 };
@@ -110,12 +110,12 @@ const ErrorHandler = {
         return true;
     },
     handle(handlerInput, error) {
-        const speechText = handlerInput.t('ERROR_MSG');
+        const speechText = util.getResponseMessage('ERROR_MSG');
         console.log(`~~~~ Error handled: ${JSON.stringify(error)}`);
 
         return handlerInput.responseBuilder
             .speak(error.toString())
-            .reprompt(handlerInput.t('REPROMPT_MSG'))
+            .reprompt(util.getResponseMessage('REPROMPT_MSG'))
             .getResponse();
     }
 };

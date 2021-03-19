@@ -25,7 +25,7 @@ const SayListIntentHandler = {
             messages = util.getSayChannelsMessages(channels,handlerInput);
             sessionAttributes['isSearchedChannels'] = false
           }
-           
+
       }else if (queryName.toLowerCase().includes("lastest episode") || queryName.toLowerCase().includes("promotion")) {
             const playlist = sessionAttributes['playlist'];
             const episodes = sessionAttributes['lastestEposides'];
@@ -39,15 +39,15 @@ const SayListIntentHandler = {
           messages.cardSubtitle,
           constants.IMAGES.standardCardSmallImageUrl,
           constants.IMAGES.standardCardLargeImageUrl
-      );        
+      );
       return handlerInput.responseBuilder
           .speak(util.speakSafeText(messages.message))
-          .reprompt(handlerInput.t('REPROMPT_MSG'))
+          .reprompt(util.getResponseMessage('REPROMPT_MSG'))
           .getResponse();
     }
     return handlerInput.responseBuilder
-      .speak(handlerInput.t('ERROR_MSG'))
-      .reprompt(handlerInput.t('REPROMPT_MSG'))
+      .speak(util.getResponseMessage('ERROR_MSG'))
+      .reprompt(util.getResponseMessage('REPROMPT_MSG'))
       .getResponse();
     }
 };
@@ -67,10 +67,10 @@ const SayRecommendedChannelsHandler = {
           messages.cardSubtitle,
           constants.IMAGES.standardCardSmallImageUrl,
           constants.IMAGES.standardCardLargeImageUrl
-      );        
+      );
       return handlerInput.responseBuilder
           .speak(util.speakSafeText(messages.message))
-          .reprompt(handlerInput.t('REPROMPT_MSG'))
+          .reprompt(util.getResponseMessage('REPROMPT_MSG'))
           .getResponse();
     }
 };
@@ -94,7 +94,7 @@ const PlayChannelIntentHandler = {
             const channelName = chosenChannel['title']
             try {
                 const description = `check channel ${channelName} lastest episodes! `;
-                await util.callDirectiveService(handlerInput, handlerInput.t('PROGRESSIVE_MSG', {description: description}));
+                await util.callDirectiveService(handlerInput, util.getResponseMessage('PROGRESSIVE_MSG', {description: description}));
             } catch (error) {
               // if it fails we can continue, but the user will wait without progressive response
               console.log("Progressive response directive error : " + error);
@@ -107,16 +107,16 @@ const PlayChannelIntentHandler = {
                 playbackInfo.playbackIndexChanged = true;
                 playbackInfo.hasPreviousPlaybackSession = false;
                 return controller.play(handlerInput);
-            }  
+            }
         }
         return responseBuilder
-          .speak(handlerInput.t('INDEX_ERROR_MSG',{name:"channel", number: channelNum}))
-          .reprompt(handlerInput.t('REPROMPT_MSG'))
+          .speak(util.getResponseMessage('INDEX_ERROR_MSG',{name:"channel", number: channelNum}))
+          .reprompt(util.getResponseMessage('REPROMPT_MSG'))
           .getResponse();
     }
     return responseBuilder
-      .speak(handlerInput.t('API_ERROR_MSG'))
-      .reprompt(handlerInput.t('REPROMPT_MSG'))
+      .speak(util.getResponseMessage('API_ERROR_MSG'))
+      .reprompt(util.getResponseMessage('REPROMPT_MSG'))
       .getResponse();
     }
 };
@@ -139,14 +139,14 @@ const PlayEpisodeIntentHandler = {
             return controller.play(handlerInput);
         }else{
             return responseBuilder
-              .speak(handlerInput.t('INDEX_ERROR_MSG',{name:"episode", number: episodeNum}))
-              .reprompt(handlerInput.t('REPROMPT_MSG'))
+              .speak(util.getResponseMessage('INDEX_ERROR_MSG',{name:"episode", number: episodeNum}))
+              .reprompt(util.getResponseMessage('REPROMPT_MSG'))
               .getResponse();
         }
     }
     return responseBuilder
-      .speak(handlerInput.t('ERROR_MSG'))
-      .reprompt(handlerInput.t('REPROMPT_MSG'))
+      .speak(util.getResponseMessage('ERROR_MSG'))
+      .reprompt(util.getResponseMessage('REPROMPT_MSG'))
       .getResponse();
     }
 };
@@ -193,34 +193,34 @@ const SaySearchResultIntentHandler = {
             }
             try {
                 const description = `search ${scope} about ${keywords} ...`;
-                await util.callDirectiveService(handlerInput, handlerInput.t('PROGRESSIVE_MSG', {description: description}));
+                await util.callDirectiveService(handlerInput, util.getResponseMessage('PROGRESSIVE_MSG', {description: description}));
             } catch (error) {
                 console.log("Progressive response directive error : " + error);
             }
-            
+
             const {message, cardTitle, cardSubtitle} = await logic.fetchSearchResults(keywords,scope,handlerInput);
-            
+
             handlerInput.responseBuilder.withStandardCard(
                 cardTitle,
                 cardSubtitle,
                 constants.IMAGES.standardCardSmallImageUrl,
                 constants.IMAGES.standardCardLargeImageUrl
             );
-            
+
             return handlerInput.responseBuilder
                 .speak(util.speakSafeText(message))
-                .reprompt(handlerInput.t('REPROMPT_MSG'))
+                .reprompt(util.getResponseMessage('REPROMPT_MSG'))
                 .getResponse();
         }
         return handlerInput.responseBuilder
-            .speak(handlerInput.t('SEARCH_CONFIRMATION_REJECTED_MSG', {name: requestScope ? requestScope : "channels or episodes"}))
-            .reprompt(handlerInput.t('REPROMPT_MSG'))
+            .speak(util.getResponseMessage('SEARCH_CONFIRMATION_REJECTED_MSG', {name: requestScope ? requestScope : "channels or episodes"}))
+            .reprompt(util.getResponseMessage('REPROMPT_MSG'))
             .getResponse();
     }
 };
 
 // baisc audio player handlers
-    
+
 const AudioPlayerEventHandler = {
   canHandle(handlerInput) {
     return Alexa.getRequestType(handlerInput.requestEnvelope).startsWith('AudioPlayer.');
@@ -231,9 +231,9 @@ const AudioPlayerEventHandler = {
       requestEnvelope,
       responseBuilder
     } = handlerInput;
-    
+
     const audioPlayerEventName = Alexa.getRequestType(requestEnvelope).split('.')[1];
-    
+
     const {
       playbackSetting,
       playbackInfo,
@@ -241,7 +241,7 @@ const AudioPlayerEventHandler = {
       playlistTokens,
       playlistLength
     } = await attributesManager.getPersistentAttributes();
-    
+
     const token = handlerInput.requestEnvelope.request.token;
     let index = playlistTokens.indexOf(token)
     if(index < 0){
@@ -322,7 +322,7 @@ const CheckAudioInterfaceHandler = {
 const StartPlaybackHandler = {
   async canHandle(handlerInput) {
     const {playbackInfo} = handlerInput.attributesManager.getSessionAttributes();
-    
+
     if (!playbackInfo.inPlaybackSession) {
       return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' && Alexa.getIntentName(handlerInput.requestEnvelope) === 'PlayPodcast';
     }
@@ -428,7 +428,7 @@ const ShuffleOnHandler = {
       playlistTokens,
       playlistLength
     } = sessionAttributes ;
-    
+
     playbackSetting.shuffle = true;
     sessionAttributes['playlistTokens'] = await shuffleOrder(playlistTokens, playlistLength);
     playbackInfo.index = 0;
@@ -453,7 +453,7 @@ const ShuffleOffHandler = {
       playlistTokens,
       playlist
     } = sessionAttributes ;
-    
+
     if (playbackSetting.shuffle) {
         const  originalPlaylistTokens = Object.keys(playlist['episodes']);
         const newIndex = originalPlaylistTokens.indexOf([playlistTokens[playbackInfo.index]]);
@@ -519,18 +519,18 @@ const HelpHandler = {
     } = handlerInput.attributesManager.getSessionAttributes();
     let message = '';
     if (!playbackInfo.hasPreviousPlaybackSession && (!sessionCounter || sessionCounter % 7 === 0)) {
-        message += handlerInput.t('BUILT_IN_HELP_WEL_VERSE') + handlerInput.t('HELP_IN_QUESTION_MSG',{number1:(Math.floor(Math.random() * 10) + 1), number2: (Math.floor(Math.random() * 10) + 1)});
+        message += util.getResponseMessage('BUILT_IN_HELP_WEL_VERSE') + util.getResponseMessage('HELP_IN_QUESTION_MSG',{number1:(Math.floor(Math.random() * 10) + 1), number2: (Math.floor(Math.random() * 10) + 1)});
     } else if (!playbackInfo.inPlaybackSession) {
         const description = playlist['episodes'][playlistTokens[playbackInfo.index]]['title'] + ' from ' +  (playlist['type'] === "channel" ? `channel ${playlist['name']}`:`${playlist['name']}`)
-        message += handlerInput.t('HELP_IN_LISENING_MSG', {description: description});
+        message += util.getResponseMessage('HELP_IN_LISENING_MSG', {description: description});
     } else {
       const isSaySample = (Math.floor(Math.random() * 10) + 1) >= 8;
       let also = '';
       if(isSaySample){
-        message += handlerInput.t('HELP_IN_COMING_BACK_SAMPLE_MSG');
+        message += util.getResponseMessage('HELP_IN_COMING_BACK_SAMPLE_MSG');
         also = 'also';
       }
-      message += handlerInput.t('HELP_IN_QUESTION_MSG',{also: also, number1:(Math.floor(Math.random() * 10) + 1), number2: (Math.floor(Math.random() * 10) + 1)});
+      message += util.getResponseMessage('HELP_IN_QUESTION_MSG',{also: also, number1:(Math.floor(Math.random() * 10) + 1), number2: (Math.floor(Math.random() * 10) + 1)});
     }
     return handlerInput.responseBuilder
       .speak(util.speakSafeText(message))
@@ -548,7 +548,7 @@ const ExitHandler = {
         Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.CancelIntent');
   },
   handle(handlerInput) {
-    const message = handlerInput.t('GOODBYE_MSG');
+    const message = util.getResponseMessage('GOODBYE_MSG');
     return handlerInput.responseBuilder
       .speak(util.speakSafeText(message))
       .withShouldEndSession(true)
@@ -566,7 +566,7 @@ const controller = {
       attributesManager,
       responseBuilder
     } = handlerInput;
-    
+
     const {
       playbackInfo,
       playlist,
@@ -582,7 +582,7 @@ const controller = {
     const playBehavior = 'REPLACE_ALL';
     const token = playlistTokens[index];
     const podcast = playlist['episodes'][token];
-    
+
     playbackInfo.nextStreamEnqueued = false;
 
     let description = podcast.title;
@@ -596,9 +596,9 @@ const controller = {
       //const subtitle = await logic.fetchChannelNameByEpisodeID(token)
       subtitle = playlist['name'].charAt(0).toUpperCase() + playlist['name'].slice(1) ;
     }
-    let message = handlerInput.t('START_PLAYING_MSG', {description: description});
+    let message = util.getResponseMessage('START_PLAYING_MSG', {description: description});
     if(index % 5 === 0 && (!sessionCounter || sessionCounter % 10 === 0)){
-        message = message + handlerInput.t('START_PLAYING_HELP_MSG')
+        message = message + util.getResponseMessage('START_PLAYING_HELP_MSG')
     }
     const backgroundImage = constants.IMAGES["backgroundImage"]
     const metadata = {
@@ -608,13 +608,13 @@ const controller = {
         backgroundImage: new Alexa.ImageHelper().addImageInstance(backgroundImage).getImage()
     }
     const cardTitle = description;
-    
+
     playbackInfo.inPlaybackSession = true;
 
-    const cardSubtitle = handlerInput.t('START_PLAYING_HELP_MSG');
+    const cardSubtitle = util.getResponseMessage('START_PLAYING_HELP_MSG');
     responseBuilder.withStandardCard(
         cardTitle,
-        handlerInput.t('START_PLAYING_HELP_MSG'),
+        util.getResponseMessage('START_PLAYING_HELP_MSG'),
         constants.IMAGES.standardCardSmallImageUrl,
         constants.IMAGES.standardCardLargeImageUrl
     );

@@ -1,8 +1,24 @@
 const AWS = require('aws-sdk');
+const i18n = require('i18next');
+const languageStrings = require('./localisation');
 
 const s3SigV4Client = new AWS.S3({
     signatureVersion: 'v4'
 });
+
+const localisationClient = i18n.init({
+    lng: 'en-US',
+    resources: languageStrings,
+    returnObjects: true
+});
+localisationClient.localise = function localise() {
+    const args = arguments;
+    const value = i18n.t(...args);
+    if (Array.isArray(value)) {
+        return value[Math.floor(Math.random() * value.length)];
+    }
+    return value;
+};
 
 module.exports = {
     getS3PreSignedUrl(s3ObjectKey) {
@@ -102,7 +118,7 @@ module.exports = {
             cardTitle += 'Channel ' + (index + 1) + " : " + channel.title + ";  "
         });
         cardSubtitle = handlerInput.t('LIST_PROMPT_NOTIFICATION_MSG',{name:"channel", number:number});
-      
+
         if(isNotificationFrist){
             message += cardSubtitle;
         }
@@ -115,7 +131,7 @@ module.exports = {
         return {message, cardTitle, cardSubtitle}
     },
     getSayPlaylistMessages(playlist,handlerInput){
-        let message, cardTitle, cardSubtitle; 
+        let message, cardTitle, cardSubtitle;
         const episodes = playlist['episodes'];
         const length = Object.keys(episodes).length;
         const maxLength = length >= 10 ? 10 : length;
@@ -149,7 +165,7 @@ module.exports = {
                 });
             }
         }
-        
+
         if(isNotificationFrist){
             message += cardSubtitle;
         }
@@ -165,14 +181,14 @@ module.exports = {
                 message += 'Episode ' + (index + 1) + " : " + episode.title + ";  "
             });
         }
-   
+
         if(!isNotificationFrist){
             message += cardSubtitle;
         }
         return {message, cardTitle, cardSubtitle}
     },
     getSayPromotionEpisodesMessages(episodes,playlist,handlerInput){
-        let message, cardTitle, cardSubtitle; 
+        let message, cardTitle, cardSubtitle;
         const length = Object.keys(episodes).length;
         const maxLength = length >= 10 ? 10 : length;
         const number = (Math.floor(Math.random() * maxLength) + 1);
@@ -184,7 +200,7 @@ module.exports = {
           cardTitle += 'Episode ' + (index + 1) + " : " + episode.title + ";  "
         });
         cardSubtitle = handlerInput.t('LIST_PROMPT_NOTIFICATION_MSG',{name:"episode", number:number});
-        
+
         if(playlist['type'] === 'channel'){
           message = handlerInput.t('LIST_PROMOTION_EPISODES_NOTIFICATION_MSG_FOR_CHANNEL')
         }else{
@@ -207,11 +223,11 @@ module.exports = {
     setPlaylist(type,name,episodes,sessionAttributes){
         const playlist = {type,name,episodes}
         const playlistTokens = Object.keys(episodes);
-        
+
         sessionAttributes['playlist'] = playlist;
         sessionAttributes['playlistTokens'] = playlistTokens;
         sessionAttributes['playlistLength'] = playlistTokens.length;
-        
+
         return {playlist, playlistTokens}
     },
     getFormatedEpisode(eposide, image, channelName=""){
@@ -226,5 +242,8 @@ module.exports = {
                     channelName:channelName
                 }
         }
+    },
+    getResponseMessage(...args){
+        return localisationClient.localise(...args);
     }
 }
