@@ -220,6 +220,7 @@ const SaySearchResultIntentHandler = {
 };
 
 // baisc audio player handlers
+    
 const AudioPlayerEventHandler = {
   canHandle(handlerInput) {
     return Alexa.getRequestType(handlerInput.requestEnvelope).startsWith('AudioPlayer.');
@@ -230,6 +231,7 @@ const AudioPlayerEventHandler = {
       requestEnvelope,
       responseBuilder
     } = handlerInput;
+    
     const audioPlayerEventName = Alexa.getRequestType(requestEnvelope).split('.')[1];
     
     const {
@@ -238,15 +240,15 @@ const AudioPlayerEventHandler = {
       playlist,
       playlistTokens,
       playlistLength
-    } = await util.getPersistentAttributes(handlerInput);
+    } = await attributesManager.getPersistentAttributes();
     
-    const token = parseInt(handlerInput.requestEnvelope.request.token, 10);
+    const token = handlerInput.requestEnvelope.request.token;
     let index = playlistTokens.indexOf(token)
     if(index < 0){
-        index = playlistTokens.indexOf(token.toString())
+        index = playlistTokens.indexOf(parseInt(token, 10))
     }
     const offsetInMilliseconds = handlerInput.requestEnvelope.request.offsetInMilliseconds;
-    
+    console.log('audio player event handler')
     switch (audioPlayerEventName) {
       case 'PlaybackStarted':
         playbackInfo.token = token ;

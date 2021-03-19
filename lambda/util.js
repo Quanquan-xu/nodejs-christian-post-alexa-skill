@@ -214,16 +214,17 @@ module.exports = {
         
         return {playlist, playlistTokens}
     },
-    async getPersistentAttributes(handlerInput){
-        const persistentAttributes = await handlerInput.attributesManager.getPersistentAttributes();
-        const {
-            playbackInfo,
-            playbackSetting,
-            playlist,
-            playlistTokens,
-            playlistLength,
-            sessionCounter
-        } = persistentAttributes;
-        return {persistentAttributes, playbackInfo,playbackSetting,playlistTokens, playlistLength, playlist,sessionCounter}
+    getFormatedEpisode(eposide, image, channelName=""){
+        return {
+            [`eposide-${eposide["id"]}`]:
+                {
+                    id: eposide["id"],
+                    title:eposide["title"],
+                    imageUrl:image["base_url"]["blob"],
+                    audioUrl:eposide["medium"]["src_url"],
+                    publishedAt: eposide["published_at"],
+                    channelName:channelName
+                }
+        }
     }
 }

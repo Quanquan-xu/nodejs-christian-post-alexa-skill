@@ -19,16 +19,7 @@ module.exports = {
             const lastestEposides = results["promotions"].filter(eposide => eposide["type"]==="episode").slice(0, 10).reduce((accumulator, currentValue) => {
                 const eposide = currentValue["episode"];
                 const image = currentValue["image"];
-                const source = {
-                    [eposide["id"]]:
-                    {
-                        id: eposide["id"],
-                        title:eposide["title"],
-                        imageUrl:image["base_url"]["blob"],
-                        audioUrl:eposide["medium"]["src_url"],
-                        publishedAt: eposide["published_at"]
-                    }
-                }
+                const source = util.getFormatedEpisode(eposide, image)
                 return Object.assign(accumulator, source)
             }, {});
             const recommendedChannels = results["recommended_channels"].slice(0, 10).map(channel => ({id:channel.id,title: channel.title}));
@@ -67,16 +58,7 @@ module.exports = {
             const channelName = result["title"]
             const image = result["image"]
             const lastestEposides = result["episodes"].slice(0, 10).reduce((accumulator, eposide) => {
-                const source = {
-                    [eposide["id"]]:
-                    {
-                        id: eposide["id"],
-                        title:eposide["title"],
-                        imageUrl:image["base_url"]["blob"],
-                        audioUrl:eposide["medium"]["src_url"],
-                        publishedAt: eposide["published_at"]
-                    }
-                }
+                const source = util.getFormatedEpisode(eposide, image)
                 return Object.assign(accumulator, source)
             }, {});
             const {playlistTokens} = util.setPlaylist("channel", channelName, lastestEposides, sessionAttributes)
@@ -118,17 +100,7 @@ module.exports = {
                 const searchedEposides = result["episodes"].slice(0, 10).reduce((accumulator, eposide) => {
                     const channelName = eposide["channel"]['title']
                     const image = eposide["channel"]["image"]
-                    const source = {
-                        [eposide["id"]]:
-                        {
-                            id: eposide["id"],
-                            title:eposide["title"],
-                            imageUrl:image["base_url"]["blob"],
-                            audioUrl:eposide["medium"]["src_url"],
-                            publishedAt: eposide["published_at"],
-                            channelName:channelName
-                        }
-                    }
+                    const source = util.getFormatedEpisode(eposide, image, channelName)
                     return Object.assign(accumulator, source)
                 }, {});
                 const {playlist} = util.setPlaylist("episode", "search episodes", searchedEposides,sessionAttributes)
