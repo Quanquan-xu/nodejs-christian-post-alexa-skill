@@ -11,6 +11,6 @@ exports.IMAGES ={
   standardCardLargeImageUrl:"https://player.edifi.app/bc26c5a8747c90d32e8bcba9d90a4323.svg",
 }
 
-exports.PERSISTENT_ATTRIBUTES_NAMES = ['updatedAt','playbackSetting', 'playbackInfo', 'lastestEposides', 'recommendedChannels', 'playlist','playlistTokens','playlistLength','sessionCounter']
+exports.PERSISTENT_ATTRIBUTES_NAMES = ['updatedAt','playbackSetting', 'playbackInfo', 'lastestEposides', 'recommendedChannels', 'playlist','playlistTokens','playlistLength', 'history', 'sessionCounter']
 
 

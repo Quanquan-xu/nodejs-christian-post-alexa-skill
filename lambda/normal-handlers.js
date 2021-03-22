@@ -18,8 +18,8 @@ const LaunchRequestHandler = {
     let reprompt;
 
     if (!playbackInfo.hasPreviousPlaybackSession) {
-      message = util.getResponseMessage('WELCOME_MSG');
-      reprompt = util.getResponseMessage('WELCOME_MSG_REPROMPT');
+        message = util.getResponseMessage('WELCOME_MSG');
+        reprompt = util.getResponseMessage('WELCOME_MSG_REPROMPT');
 
     } else {
       playbackInfo.inPlaybackSession = false;
@@ -111,6 +111,7 @@ const ErrorHandler = {
     },
     handle(handlerInput, error) {
         const speechText = util.getResponseMessage('ERROR_MSG');
+        console.log(`~~~~ Error handled: ${JSON.stringify(handlerInput)}`);
         console.log(`~~~~ Error handled: ${JSON.stringify(error)}`);
 
         return handlerInput.responseBuilder

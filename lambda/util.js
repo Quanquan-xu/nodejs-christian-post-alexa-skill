@@ -1,6 +1,8 @@
 const AWS = require('aws-sdk');
 const i18n = require('i18next');
 const languageStrings = require('./localisation');
+const constants = require('./constants');
+
 
 const s3SigV4Client = new AWS.S3({
     signatureVersion: 'v4'
@@ -45,30 +47,9 @@ module.exports = {
             // IMPORTANT: don't forget to give DynamoDB access to the role you're using to run this lambda (via IAM policy)
             const {DynamoDbPersistenceAdapter} = require('ask-sdk-dynamodb-persistence-adapter');
             return new DynamoDbPersistenceAdapter({
-                tableName: tableName || 'happy_birthday',
+                tableName: tableName || 'edifi_podcast',
                 createTable: true
             });
-        }
-    },
-    createReminder(requestMoment, scheduledMoment, timezone, locale, message) {
-        return {
-            requestTime: requestMoment.format('YYYY-MM-DDTHH:mm:00.000'),
-            trigger: {
-                type: 'SCHEDULED_ABSOLUTE',
-                scheduledTime: scheduledMoment.format('YYYY-MM-DDTHH:mm:00.000'),
-                timeZoneId: timezone
-            },
-            alertInfo: {
-                spokenInfo: {
-                    content: [{
-                        locale: locale,
-                        text: message
-                    }]
-                }
-            },
-            pushNotification: {
-                status: 'ENABLED'
-            }
         }
     },
     callDirectiveService(handlerInput, msg) {
@@ -245,5 +226,35 @@ module.exports = {
     },
     getResponseMessage(...args){
         return localisationClient.localise(...args);
-    }
+    },
+    getResumeMessageResponse(episode,playlist,handlerInput){
+        let description;
+        if(playlist['type']==="channel"){
+            description = episode.title + ' from channel ' + playlist['name']
+        }else{
+            description = episode.title + ' from ' + playlist['name']
+        }
+        const message = this.getResponseMessage('START_PLAYING_RESUME_MSG', {description:description})
+        const reprompt = this.getResponseMessage('START_PLAYING_RESUME_MSG_REPROMPT');
+        handlerInput.responseBuilder.withStandardCard(
+            this.speakSafeText(message),
+            reprompt,
+            constants.IMAGES.standardCardSmallImageUrl,
+            constants.IMAGES.standardCardLargeImageUrl
+        );
+        return handlerInput.responseBuilder
+            .speak(this.speakSafeText(message))
+            .reprompt(reprompt)
+            .getResponse();
+    },
+    // removeResumeHistoryEpisode(playbackInfo, history){
+    //     if(history.resume){
+    //         const token = playbackInfo.token;
+    //         const episodes = history['episodes'];
+    //         if(episodes.includes(token)){
+    //             delete history['episodes'][token]
+    //         }
+    //         history.resume = false
+    //     }
+    // }
 }

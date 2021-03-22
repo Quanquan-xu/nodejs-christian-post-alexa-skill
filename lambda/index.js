@@ -41,6 +41,7 @@ exports.handler = skillBuilder
     normalHandlers.FallbackIntentHandler,
     normalHandlers.IntentReflectorHandler
   )
+  .addErrorHandlers(normalHandlers.ErrorHandler)
   .addRequestInterceptors(
     interceptors.LoadAttributesRequestInterceptor,
     interceptors.LocalisationRequestInterceptor,
@@ -49,9 +50,8 @@ exports.handler = skillBuilder
   .addResponseInterceptors(
     interceptors.LoggingResponseInterceptor,
     interceptors.SaveAttributesResponseInterceptor,
-    interceptors.SavePersistentAttributesResponseInterceptor
   )
   .withPersistenceAdapter(util.getPersistenceAdapter())
-  .addErrorHandlers(normalHandlers.ErrorHandler)
+  .withApiClient(new Alexa.DefaultApiClient())
   .withCustomUserAgent('sample/hello-world/v1.2')
   .lambda();

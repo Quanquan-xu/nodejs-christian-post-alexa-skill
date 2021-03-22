@@ -221,7 +221,19 @@ const SaySearchResultIntentHandler = {
 
 // baisc audio player handlers
 
+
 const AudioPlayerEventHandler = {
+  canHandle(handlerInput) {
+    return Alexa.getRequestType(handlerInput.requestEnvelope)==="AudioPlayer.PlaybackStopped";
+  },
+  handle(handlerInput) {
+        console.log("test code")
+        return handlerInput.responseBuilder.getResponse();
+    }
+    
+}
+
+const AudioPlayerEventHandler123 = {
   canHandle(handlerInput) {
     return Alexa.getRequestType(handlerInput.requestEnvelope).startsWith('AudioPlayer.');
   },
@@ -231,16 +243,17 @@ const AudioPlayerEventHandler = {
       requestEnvelope,
       responseBuilder
     } = handlerInput;
-
+    
     const audioPlayerEventName = Alexa.getRequestType(requestEnvelope).split('.')[1];
-
+    //const persistentAttributes = await attributesManager.getPersistentAttributes() 
     const {
       playbackSetting,
       playbackInfo,
       playlist,
       playlistTokens,
-      playlistLength
-    } = await attributesManager.getPersistentAttributes();
+      playlistLength,
+      history
+    } = await attributesManager.getPersistentAttributes() 
 
     const token = handlerInput.requestEnvelope.request.token;
     let index = playlistTokens.indexOf(token)
@@ -260,11 +273,13 @@ const AudioPlayerEventHandler = {
         playbackInfo.inPlaybackSession = false;
         playbackInfo.hasPreviousPlaybackSession = false;
         playbackInfo.nextStreamEnqueued = false;
+        //Object.assign(history, {token:0})
         break;
       case 'PlaybackStopped':
         playbackInfo.token = token;
         playbackInfo.index = index;
         playbackInfo.offsetInMilliseconds = offsetInMilliseconds;
+        //Object.assign(history, {token:offsetInMilliseconds})
         break;
       case 'PlaybackNearlyFinished':
         {
@@ -285,7 +300,7 @@ const AudioPlayerEventHandler = {
           const podcast = playlist['episodes'][enqueueToken];
           const expectedPreviousToken = playbackInfo.token;
           const offsetInMilliseconds = 0;
-
+          //Object.assign(history, {token:0})
           responseBuilder.addAudioPlayerPlayDirective(
             playBehavior,
             podcast.url,
@@ -297,6 +312,7 @@ const AudioPlayerEventHandler = {
         }
       case 'PlaybackFailed':
         playbackInfo.inPlaybackSession = false;
+        //Object.assign(history, {token:offsetInMilliseconds})
         console.log('Playback Failed : %j', handlerInput.requestEnvelope.request.error);
         return;
       default:
@@ -485,6 +501,8 @@ const YesHandler = {
     return !playbackInfo.inPlaybackSession && Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.YesIntent';
   },
   handle(handlerInput) {
+    // const {playbackInfo, history} = handlerInput.attributesManager.getSessionAttributes();
+    // util.removeResumeHistoryEpisode(playbackInfo, history)
     return controller.play(handlerInput);
   },
 };
@@ -496,7 +514,11 @@ const NoHandler = {
   },
   async handle(handlerInput) {
     const {playbackInfo} = handlerInput.attributesManager.getSessionAttributes();
-    playbackInfo.index = 0;
+    // const {playbackInfo, history} = handlerInput.attributesManager.getSessionAttributes();
+    // if(!history.resume){
+    //     playbackInfo.index = 0;
+    // }
+    // util.removeResumeHistoryEpisode(playbackInfo, history)
     playbackInfo.offsetInMilliseconds = 0;
     playbackInfo.playbackIndexChanged = true;
     playbackInfo.hasPreviousPlaybackSession = false;
@@ -571,6 +593,7 @@ const controller = {
       playbackInfo,
       playlist,
       playlistTokens,
+      history,
       sessionCounter
     } = handlerInput.attributesManager.getSessionAttributes();
 
@@ -578,11 +601,19 @@ const controller = {
       offsetInMilliseconds,
       index
     } = playbackInfo;
-
+    
     const playBehavior = 'REPLACE_ALL';
     const token = playlistTokens[index];
     const podcast = playlist['episodes'][token];
-
+    
+    playbackInfo.token = token;
+    
+    // if(history['episodes'][token] && history['episodes'][token] > 6000){
+    //     history.resume = true;
+    //     playbackInfo.offsetInMilliseconds = history['episodes'][token];
+    //     return util.getResumeMessageResponse(podcast,playlist,handlerInput)
+    // }
+    
     playbackInfo.nextStreamEnqueued = false;
 
     let description = podcast.title;
