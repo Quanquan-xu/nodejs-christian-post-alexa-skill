@@ -1,9 +1,51 @@
 {
   "manifest": {
+    "publishingInformation": {
+      "locales": {
+        "en-US": {
+          "summary": "A collection of transformational and faith-inspiring Christian podcasts.",
+          "examplePhrases": [
+            "Alexa, open Edifi Podcast",
+            "Alexa, ask Edifi Podcast channel list",
+            "Alexa, ask Edifi Podcast search episodes about Jesus loves me"
+          ],
+          "keywords": [
+            "Edifi",
+            "Christian",
+            "podcast",
+            "Jesus",
+            "Christ",
+            "God",
+            "faith",
+            "gospel",
+            "bible",
+            "religion",
+            "spirituality",
+            "Words",
+            "sermon",
+            "transformational",
+            "faith-inspiring",
+            "life"
+          ],
+          "name": "Edifi Podcast",
+          "description": "\"The earth shall be full of the knowledge of the Lord as the waters cover the sea.\" (Isaiah 11:9)  \n\nAre you looking for transformational and faith-inspiring Christian podcasts? Enable Edifi Podcast Skill — a truly powerful Alexa skill that brings together thousands of the best Christian podcasts in one place for your listening enjoyment. Cut through the noise and grow your faith by diving into the world’s top Christian podcasts today.\n\nEdifi Podcast is filled with the best Christian podcasts — safe content that will edify and inspire your faith. With Edifi Podcast Alexa Skill, you can easily listen to latest episodes from Edifi promotion or popular channels. And you can also quickly search for new podcasts by channel or topic, and discover phenomenal, new Christian podcasts in the process. \n\nHOW DOES IT WORK?\nJust ask your Alexa skill to talk to Edifi Podcast. We\u0027ll have promotion episodes and recommended channels when you need some podcasts, and you can also search channels or episodes by keywords when you want to listen to specific topic.\n\nYou can say...\n-Alexa, open Edifi Podcast\n-Alexa, tell Edifi Podcast play promotion episodes\n-Alexa, tell Edifi Podcast list recommended channels\n-Alexa, ask Edifi Podcast for my playlist\n-Alexa, tell Edifi Podcast search channels\n-Alexa, tell Edifi Podcast search episodes about \u0027God so loved the world\u0027",
+          "smallIconUri": "file://assets/images/en-US_smallIconUri.png",
+          "largeIconUri": "file://assets/images/en-US_largeIconUri.png"
+        }
+      },
+      "automaticDistribution": {
+        "isActive": false
+      },
+      "isAvailableWorldwide": true,
+      "testingInstructions": "Sample Testing Instructions.",
+      "category": "PODCAST",
+      "distributionMode": "PUBLIC",
+      "distributionCountries": []
+    },
     "apis": {
       "custom": {
         "endpoint": {
-          "uri": "arn:aws:lambda:us-east-1:074313704564:function:05a8be37-34fa-4ad4-a98a-fd9583d2e56b:Release_0"
+          "uri": "arn:aws:lambda:us-east-1:074313704564:function:27b19e1e-8901-4938-81c4-7c11bd8a815a:Release_0"
         },
         "interfaces": [
           {
@@ -11,19 +53,19 @@
           }
         ],
         "regions": {
-          "NA": {
-            "endpoint": {
-              "uri": "arn:aws:lambda:us-east-1:074313704564:function:05a8be37-34fa-4ad4-a98a-fd9583d2e56b:Release_0"
-            }
-          },
           "EU": {
             "endpoint": {
-              "uri": "arn:aws:lambda:eu-west-1:074313704564:function:05a8be37-34fa-4ad4-a98a-fd9583d2e56b:Release_0"
+              "uri": "arn:aws:lambda:eu-west-1:074313704564:function:27b19e1e-8901-4938-81c4-7c11bd8a815a:Release_0"
+            }
+          },
+          "NA": {
+            "endpoint": {
+              "uri": "arn:aws:lambda:us-east-1:074313704564:function:27b19e1e-8901-4938-81c4-7c11bd8a815a:Release_0"
             }
           },
           "FE": {
             "endpoint": {
-              "uri": "arn:aws:lambda:us-west-2:074313704564:function:05a8be37-34fa-4ad4-a98a-fd9583d2e56b:Release_0"
+              "uri": "arn:aws:lambda:us-west-2:074313704564:function:27b19e1e-8901-4938-81c4-7c11bd8a815a:Release_0"
             }
           }
         }
@@ -31,43 +73,17 @@
     },
     "manifestVersion": "1.0",
     "privacyAndCompliance": {
-       "locales": {
-        "en-US": {
-          "privacyPolicyUrl": "https://player.edifi.app/about-us",
-          "termsOfUseUrl": "https://player.edifi.app/about-us"
-        }
-      }
-    },
-
-    "publishingInformation": {
-      "automaticDistribution": {
-        "isActive": false
-      },
-      "category": "KNOWLEDGE_AND_TRIVIA",
-      "distributionCountries": [],
-      "isAvailableWorldwide": true,
+      "allowsPurchases": false,
       "locales": {
-         "en-US": {
-          "name": "my player",
-          "smallIconUri": "https://happybirthday-alexa.s3-eu-west-1.amazonaws.com/icon_108.png",
-          "largeIconUri": "https://happybirthday-alexa.s3-eu-west-1.amazonaws.com/icon_512.png",
-          "summary": "Edifi is a modern, fully featured Christian-centric audio podcast player.",
-          "description": "\"The earth shall be full of the knowledge of the Lord as the waters cover the sea.\"(Isaiah 11:9)",
-          "examplePhrases": [
-            "Alexa, open Edifi Podcast",
-            "Alexa, ask Edifi Podcast the latest espisode"
-          ],
-          "keywords": [
-            "Christian",
-            "podcast",
-            "gospel",
-            "God",
-            "Jesus Christ",
-            "Lord"
-          ]
+        "en-US": {
+          "termsOfUseUrl": "https://player.edifi.app/about-us",
+          "privacyPolicyUrl": "https://player.edifi.app/about-us"
         }
       },
-      "testingInstructions": "Sample Testing Instructions."
+      "containsAds": false,
+      "isExportCompliant": true,
+      "isChildDirected": false,
+      "usesPersonalInfo": false
     }
   }
 }
