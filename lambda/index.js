@@ -15,6 +15,7 @@ const skillBuilder = Alexa.SkillBuilders.custom();
 exports.handler = skillBuilder
   .addRequestHandlers(
     audioPlayerHandlers.CheckAudioInterfaceHandler,
+    audioPlayerHandlers.AudioPlayerEventHandler,
     normalHandlers.LaunchRequestHandler,
     audioPlayerHandlers.SayListIntentHandler,
     audioPlayerHandlers.SayRecommendedChannelsHandler,
@@ -35,7 +36,6 @@ exports.handler = skillBuilder
     audioPlayerHandlers.ShuffleOffHandler,
     audioPlayerHandlers.StartOverHandler,
     audioPlayerHandlers.ExitHandler,
-    audioPlayerHandlers.AudioPlayerEventHandler,
     normalHandlers.SessionEndedRequestHandler,
     normalHandlers.SystemExceptionHandler,
     normalHandlers.FallbackIntentHandler,

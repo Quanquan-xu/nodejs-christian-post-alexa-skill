@@ -11,7 +11,7 @@ module.exports = {
             ERROR_MSG: 'Sorry, there was an error. Please try again.',
             DEVELOPING_MSG: 'Sorry, This feature is not currently supported!',
             BUILT_IN_HELP_WEL_VERSE:'The earth shall be full of the knowledge of the Lord as the waters cover the sea! Welcome to the Edifi Podcast! The Edifi Podcast is a collection of transformational and faith-inspiring podcasts. ',
-            HELP_IN_LISENING_MSG: `You are listening to  {{description}} . You can say, Next or Previous to navigate through the playlist. At any time, you can say Pause to pause the audio and Resume to resume. You can also say, Alexa, channel list, to check recommended channels! Or say, Alexa, search channels or episodes, to search channels or episodes`,
+            HELP_IN_LISENING_MSG: `You are listening to  {{description}} . You can say, Alexa, my playlist, to look through the playlist. You can also say, Alexa, channel list, to check recommended channels! Or say, Alexa, search channels or episodes, to search channels or episodes`,
             HELP_IN_QUESTION_MSG: `You can {{also}} have channel or promotion episodes list by saying, Alexa, channel list , or Alexa, promotion episodes list. You can use number, instead of name by saying, Alexa, episode {{number1}} or channel {{number2}}, to start podcast. Or say, Alexa, search, to search channels or episodes`,
             HELP_IN_COMING_BACK_SAMPLE_MSG: 'You can play podcast channel or episode by saying, alexa, play channel Pastor Rick\'s Daily Hope, or alexa, play Dr. Tony Evans\'s episodes. ',
             GOODBYE_MSG: ['Goodbye! ', 'So long! ', 'See you later! ', 'Cheers! '],

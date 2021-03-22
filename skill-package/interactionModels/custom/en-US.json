@@ -109,45 +109,6 @@
                     ]
                 },
                 {
-                    "name": "PlayList",
-                    "slots": [
-                        {
-                            "name": "channel",
-                            "type": "AMAZON.BroadcastChannel"
-                        },
-                        {
-                            "name": "pastor",
-                            "type": "AMAZON.Author"
-                        }
-                    ],
-                    "samples": [
-                        "start pastor {pastor} episodes list",
-                        "start pastor {pastor} audios list",
-                        "start pastor {pastor} sermon list",
-                        "start pastor {pastor} channel list",
-                        "play pastor {pastor} episodes list",
-                        "play pastor {pastor} audios list",
-                        "play pastor {pastor} sermon list",
-                        "play pastor {pastor} channel list",
-                        "pastor {pastor} episodes list",
-                        "pastor {pastor} audios list",
-                        "pastor {pastor} sermon list",
-                        "pastor {pastor} channel list",
-                        "list pastor {pastor} episodes",
-                        "list pastor {pastor} audios",
-                        "list pastor {pastor} sermons",
-                        "list pastor {pastor} channel",
-                        "start {channel} channel list",
-                        "start channel {channel} list",
-                        "play {channel} channel list",
-                        "play channel {channel} list",
-                        "list {channel} channel",
-                        "list channel {channel}",
-                        "{channel} channel list",
-                        "channel {channel} list"
-                    ]
-                },
-                {
                     "name": "SayList",
                     "slots": [
                         {

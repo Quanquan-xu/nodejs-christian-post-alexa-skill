@@ -175,7 +175,6 @@ const SaySearchResultIntentHandler = {
     },
     async handle(handlerInput) {
         const {attributesManager, requestEnvelope} = handlerInput;
-        // the attributes manager allows us to access session attributes
         const sessionAttributes = attributesManager.getSessionAttributes();
         const {intent} = requestEnvelope.request;
         let requestScope = "";
@@ -221,19 +220,20 @@ const SaySearchResultIntentHandler = {
 
 // baisc audio player handlers
 
-
-const AudioPlayerEventHandler = {
-  canHandle(handlerInput) {
-    return Alexa.getRequestType(handlerInput.requestEnvelope)==="AudioPlayer.PlaybackStopped";
+const CheckAudioInterfaceHandler = {
+  async canHandle(handlerInput) {
+    const audioPlayerInterface = ((((handlerInput.requestEnvelope.context || {}).System || {}).device || {}).supportedInterfaces || {}).AudioPlayer;
+    return audioPlayerInterface === undefined
   },
   handle(handlerInput) {
-        console.log("test code")
-        return handlerInput.responseBuilder.getResponse();
-    }
+    return handlerInput.responseBuilder
+      .speak('Sorry, this skill is not supported on this device')
+      .withShouldEndSession(true)
+      .getResponse();
+  },
+};
 
-}
-
-const AudioPlayerEventHandler123 = {
+const AudioPlayerEventHandler = {
   canHandle(handlerInput) {
     return Alexa.getRequestType(handlerInput.requestEnvelope).startsWith('AudioPlayer.');
   },
@@ -245,7 +245,6 @@ const AudioPlayerEventHandler123 = {
     } = handlerInput;
 
     const audioPlayerEventName = Alexa.getRequestType(requestEnvelope).split('.')[1];
-    //const persistentAttributes = await attributesManager.getPersistentAttributes()
     const {
       playbackSetting,
       playbackInfo,
@@ -261,7 +260,6 @@ const AudioPlayerEventHandler123 = {
         index = playlistTokens.indexOf(parseInt(token, 10))
     }
     const offsetInMilliseconds = handlerInput.requestEnvelope.request.offsetInMilliseconds;
-    console.log('audio player event handler')
     switch (audioPlayerEventName) {
       case 'PlaybackStarted':
         playbackInfo.token = token ;
@@ -273,26 +271,24 @@ const AudioPlayerEventHandler123 = {
         playbackInfo.inPlaybackSession = false;
         playbackInfo.hasPreviousPlaybackSession = false;
         playbackInfo.nextStreamEnqueued = false;
-        Object.assign(history, {[token]:0})
+        Object.assign(history["episodes"], {[token]:0})
         break;
       case 'PlaybackStopped':
         playbackInfo.token = token;
         playbackInfo.index = index;
         playbackInfo.offsetInMilliseconds = offsetInMilliseconds;
-        Object.assign(history, {[token]:offsetInMilliseconds})
+        Object.assign(history["episodes"], {[token]:offsetInMilliseconds})
         break;
       case 'PlaybackNearlyFinished':
         {
           if (playbackInfo.nextStreamEnqueued) {
             break;
           }
-
           const enqueueIndex = (playbackInfo.index + 1) % playlistLength;
 
           if (enqueueIndex === 0 && !playbackSetting.loop) {
             break;
           }
-
           playbackInfo.nextStreamEnqueued = true;
 
           const enqueueToken = playlistTokens[enqueueIndex];
@@ -300,19 +296,29 @@ const AudioPlayerEventHandler123 = {
           const podcast = playlist['episodes'][enqueueToken];
           const expectedPreviousToken = playbackInfo.token;
           const offsetInMilliseconds = 0;
-          Object.assign(history, {[token]:0})
+          Object.assign(history["episodes"], {[token]:0});
+
+          const {subtitle} = util.getDescriptionSubtitleMessage(podcast, playlist);
+          const backgroundImage = constants.IMAGES["backgroundImage"]
+          const metadata = {
+            title: podcast.title,
+            subtitle: subtitle,
+            art: new Alexa.ImageHelper().addImageInstance(podcast.imageUrl).getImage(),
+            backgroundImage: new Alexa.ImageHelper().addImageInstance(backgroundImage).getImage()
+          }
           responseBuilder.addAudioPlayerPlayDirective(
             playBehavior,
-            podcast.url,
+            podcast.audioUrl,
             enqueueToken,
             offsetInMilliseconds,
             expectedPreviousToken,
+            metadata
           );
           break;
         }
       case 'PlaybackFailed':
         playbackInfo.inPlaybackSession = false;
-        Object.assign(history, {[token]:offsetInMilliseconds})
+        Object.assign(history["episodes"], {[token]:offsetInMilliseconds})
         console.log('Playback Failed : %j', handlerInput.requestEnvelope.request.error);
         return;
       default:
@@ -322,23 +328,9 @@ const AudioPlayerEventHandler123 = {
   },
 };
 
-const CheckAudioInterfaceHandler = {
-  async canHandle(handlerInput) {
-    const audioPlayerInterface = ((((handlerInput.requestEnvelope.context || {}).System || {}).device || {}).supportedInterfaces || {}).AudioPlayer;
-    return audioPlayerInterface === undefined
-  },
-  handle(handlerInput) {
-    return handlerInput.responseBuilder
-      .speak('Sorry, this skill is not supported on this device')
-      .withShouldEndSession(true)
-      .getResponse();
-  },
-};
-
 const StartPlaybackHandler = {
   async canHandle(handlerInput) {
     const {playbackInfo} = handlerInput.attributesManager.getSessionAttributes();
-
     if (!playbackInfo.inPlaybackSession) {
       return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' && Alexa.getIntentName(handlerInput.requestEnvelope) === 'PlayPodcast';
     }
@@ -497,8 +489,8 @@ const StartOverHandler = {
 
 const YesHandler = {
   async canHandle(handlerInput) {
-    const {playbackInfo} = handlerInput.attributesManager.getSessionAttributes();
-    return !playbackInfo.inPlaybackSession && Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.YesIntent';
+    const {playbackInfo,history} = handlerInput.attributesManager.getSessionAttributes();
+    return (!playbackInfo.inPlaybackSession || history.resume) && Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.YesIntent';
   },
   handle(handlerInput) {
     const {playbackInfo, history} = handlerInput.attributesManager.getSessionAttributes();
@@ -509,8 +501,8 @@ const YesHandler = {
 
 const NoHandler = {
   async canHandle(handlerInput) {
-    const {playbackInfo} = handlerInput.attributesManager.getSessionAttributes();
-    return !playbackInfo.inPlaybackSession && Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.NoIntent';
+    const {playbackInfo, history} = handlerInput.attributesManager.getSessionAttributes();
+    return (!playbackInfo.inPlaybackSession || history.resume) && Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.NoIntent';
   },
   async handle(handlerInput) {
     const {playbackInfo, history} = handlerInput.attributesManager.getSessionAttributes();
@@ -538,11 +530,14 @@ const HelpHandler = {
       playlistTokens,
       sessionCounter
     } = handlerInput.attributesManager.getSessionAttributes();
+
     let message = '';
+
     if (!playbackInfo.hasPreviousPlaybackSession && (!sessionCounter || sessionCounter % 7 === 0)) {
         message += util.getResponseMessage('BUILT_IN_HELP_WEL_VERSE') + util.getResponseMessage('HELP_IN_QUESTION_MSG',{number1:(Math.floor(Math.random() * 10) + 1), number2: (Math.floor(Math.random() * 10) + 1)});
     } else if (!playbackInfo.inPlaybackSession) {
-        const description = playlist['episodes'][playlistTokens[playbackInfo.index]]['title'] + ' from ' +  (playlist['type'] === "channel" ? `channel ${playlist['name']}`:`${playlist['name']}`)
+        const episode = playlist['episodes'][playlistTokens[playbackInfo.index]];
+        const {description, subtitle} = util.getDescriptionSubtitleMessage(episode, playlist);
         message += util.getResponseMessage('HELP_IN_LISENING_MSG', {description: description});
     } else {
       const isSaySample = (Math.floor(Math.random() * 10) + 1) >= 8;
@@ -553,6 +548,12 @@ const HelpHandler = {
       }
       message += util.getResponseMessage('HELP_IN_QUESTION_MSG',{also: also, number1:(Math.floor(Math.random() * 10) + 1), number2: (Math.floor(Math.random() * 10) + 1)});
     }
+    handlerInput.responseBuilder.withStandardCard(
+      message,
+      "",
+      constants.IMAGES.standardCardSmallImageUrl,
+      constants.IMAGES.standardCardLargeImageUrl
+    );
     return handlerInput.responseBuilder
       .speak(util.speakSafeText(message))
       .reprompt(util.speakSafeText(message))
@@ -606,22 +607,26 @@ const controller = {
     const podcast = playlist['episodes'][token];
 
     playbackInfo.token = token;
-
-    if(history['episodes'][token] && history['episodes'][token] > 6000){
+    console.log("history-offsetInMilliseconds", history['episodes'])
+    
+    if(history['episodes'][token] && history['episodes'][token] > 30000){
+        
         history.resume = true;
-        playbackInfo.offsetInMilliseconds = history['episodes'][token];
+        playbackInfo.offsetInMilliseconds = parseInt(history['episodes'][token]) - 5000;
+        console.log("offsetInMilliseconds", token)
+        console.log("offsetInMilliseconds", history['episodes'][token])
         return util.getResumeMessageResponse(podcast,playlist,handlerInput)
     }
 
     playbackInfo.nextStreamEnqueued = false;
 
     const {description,subtitle} = util.getDescriptionSubtitleMessage(podcast, playlist);
-    
+
     let message = util.getResponseMessage('START_PLAYING_MSG', {description: description});
     if(index % 5 === 0 && (!sessionCounter || sessionCounter % 10 === 0)){
         message = message + util.getResponseMessage('START_PLAYING_HELP_MSG')
     }
-    
+
     const backgroundImage = constants.IMAGES["backgroundImage"]
     const metadata = {
         title: podcast.title,
@@ -630,8 +635,6 @@ const controller = {
         backgroundImage: new Alexa.ImageHelper().addImageInstance(backgroundImage).getImage()
     }
     const cardTitle = description;
-
-    playbackInfo.inPlaybackSession = true;
 
     const cardSubtitle = util.getResponseMessage('START_PLAYING_HELP_MSG');
     responseBuilder.withStandardCard(

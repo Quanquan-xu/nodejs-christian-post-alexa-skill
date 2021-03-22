@@ -230,7 +230,7 @@ module.exports = {
     getDescriptionSubtitleMessage(eposide,playlist){
         let description;
         let subtitle;
-    
+
         if(playlist['type'] ==="channel"){
             description = eposide.title + " from  channel " + playlist['name'];
             subtitle = playlist['name'];
@@ -241,7 +241,7 @@ module.exports = {
             }else{
                 //const subtitle = await logic.fetchChannelNameByEpisodeID(token)
                 description = eposide.title + " from " + playlist['name'];
-                subtitle = playlist['name'].charAt(0).toUpperCase() + playlist['name'].slice(1) ;  
+                subtitle = playlist['name'].charAt(0).toUpperCase() + playlist['name'].slice(1) ;
             }
         }
         return {description, subtitle}
@@ -269,7 +269,7 @@ module.exports = {
     removeResumeHistoryEpisode(playbackInfo, history){
         if(history.resume){
             const token = playbackInfo.token;
-            const episodes = history['episodes'];
+            const episodes = Object.keys(history['episodes']);
             if(episodes.includes(token)){
                 delete history['episodes'][token]
             }

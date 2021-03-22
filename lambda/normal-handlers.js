@@ -20,15 +20,13 @@ const LaunchRequestHandler = {
     if (!playbackInfo.hasPreviousPlaybackSession) {
         message = util.getResponseMessage('WELCOME_MSG');
         reprompt = util.getResponseMessage('WELCOME_MSG_REPROMPT');
-
     } else {
-      playbackInfo.inPlaybackSession = false;
-      const episodes = playlist['episodes'];
-      const episode = episodes[playlistTokens[playbackInfo.index]]
-      const {description} = util.getDescriptionSubtitleMessage(episode, playlist);
-      
-      message = util.getResponseMessage('WELCOME_BACK_MSG', {description:description})
-      reprompt = util.getResponseMessage('WELCOME_BACK_MSG_REPROMPT');
+        playbackInfo.inPlaybackSession = false;
+        const episodes = playlist['episodes'];
+        const episode = episodes[playlistTokens[playbackInfo.index]]
+        const {description} = util.getDescriptionSubtitleMessage(episode, playlist);
+        message = util.getResponseMessage('WELCOME_BACK_MSG', {description:description})
+        reprompt = util.getResponseMessage('WELCOME_BACK_MSG_REPROMPT');
     }
     handlerInput.responseBuilder.withStandardCard(
         util.speakSafeText(message),
@@ -36,7 +34,6 @@ const LaunchRequestHandler = {
         constants.IMAGES.standardCardSmallImageUrl,
         constants.IMAGES.standardCardLargeImageUrl
     );
-
     return handlerInput.responseBuilder
       .speak(util.speakSafeText(message))
       .reprompt(reprompt)
@@ -73,7 +70,7 @@ const SessionEndedRequestHandler = {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'SessionEndedRequest';
     },
     handle(handlerInput) {
-        console.log(`~~~~ Session ended: ${JSON.stringify(handlerInput.requestEnvelope)}`);
+        //console.log(`~~~~ Session ended: ${JSON.stringify(handlerInput.requestEnvelope)}`);
         // Any cleanup logic goes here.
         return handlerInput.responseBuilder.getResponse(); // notice we send an empty response
     }
@@ -91,7 +88,7 @@ const IntentReflectorHandler = {
     handle(handlerInput) {
         return handlerInput.responseBuilder
         .speak(util.getResponseMessage('REPROMPT_MSG'))
-        .reprompt(util.getResponseMessage('REPROMPT_MSG'))
+        //.reprompt(util.getResponseMessage('REPROMPT_MSG'))
         .getResponse();
     }
 };
@@ -107,13 +104,14 @@ const ErrorHandler = {
     },
     handle(handlerInput, error) {
         const speechText = util.getResponseMessage('ERROR_MSG');
-        console.log(`~~~~ Error handled: ${JSON.stringify(handlerInput)}`);
-        console.log(`~~~~ Error handled: ${JSON.stringify(error)}`);
+        //console.log(`~~~~ Error handled: ${JSON.stringify(handlerInput)}`);
+        //console.log(`~~~~ Error handled: ${JSON.stringify(error)}`);
+        console.log(`~~~~ Error handled: ${error.toString()}`);
 
-        // return handlerInput.responseBuilder
-        //     .speak(error.toString())
-        //     .reprompt(util.getResponseMessage('REPROMPT_MSG'))
-        //     .getResponse();
+        return handlerInput.responseBuilder
+            //.speak(error.toString())
+            //.reprompt(util.getResponseMessage('REPROMPT_MSG'))
+            .getResponse();
     }
 };
 

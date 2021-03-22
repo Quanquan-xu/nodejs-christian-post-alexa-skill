@@ -46,6 +46,7 @@ const LocalisationRequestInterceptor = {
 const LoadAttributesRequestInterceptor = {
     async process(handlerInput) {
         const {attributesManager, requestEnvelope} = handlerInput;
+        if(Alexa.getRequestType(handlerInput.requestEnvelope).startsWith('AudioPlayer.')) return;
         const sessionAttributes = attributesManager.getSessionAttributes();
         // the "loaded" check is because the "new" session flag is lost if there's a one shot utterance that hits an intent with auto-delegate
         if (Alexa.isNewSession(requestEnvelope) || !sessionAttributes['loaded']){ //is this a new session? not loaded from db?
@@ -90,6 +91,10 @@ const SaveAttributesResponseInterceptor = {
     async process(handlerInput, response) {
         if (!response) return; // avoid intercepting calls that have no outgoing response due to errors
         const {attributesManager, requestEnvelope} = handlerInput;
+        if(Alexa.getRequestType(handlerInput.requestEnvelope).startsWith('AudioPlayer.')){
+             await attributesManager.savePersistentAttributes();
+             return;
+        }
         const sessionAttributes = attributesManager.getSessionAttributes();
         const shouldEndSession = (typeof response.shouldEndSession === "undefined" ? true : response.shouldEndSession); //is this a session end?
         // the "loaded" check is because the session "new" flag is lost if there's a one shot utterance that hits an intent with auto-delegate
