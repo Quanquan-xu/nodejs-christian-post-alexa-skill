@@ -65,10 +65,10 @@ const LoadAttributesRequestInterceptor = {
                     inPlaybackSession: true,
                     hasPreviousPlaybackSession: false,
                   },
-                //   history:{
-                //       resume:false,
-                //       episodes:{}
-                //   }
+                  history:{
+                      resume:false,
+                      episodes:{}
+                  }
                 }
             }
             if(!persistentAttributes['updatedAt'] || persistentAttributes['updatedAt'] < ( Date.now() - 4 * 1000 * 3600)){
@@ -78,7 +78,7 @@ const LoadAttributesRequestInterceptor = {
             }
             console.log('Loading from persistent storage: ' + JSON.stringify(persistentAttributes));
             persistentAttributes['loaded'] = true;
-            //persistentAttributes['history']['resume'] = false;
+            persistentAttributes['history']['resume'] = false;
             //copy persistent attribute to session attributes
             attributesManager.setSessionAttributes(persistentAttributes); // ALL persistent attributtes are now session attributes
         }
@@ -97,13 +97,13 @@ const SaveAttributesResponseInterceptor = {
         if ((shouldEndSession || Alexa.getRequestType(requestEnvelope) === 'SessionEndedRequest') && loadedThisSession) { // skill was stopped or timed out
             // we increment a persistent session counter here
             sessionAttributes['sessionCounter'] = sessionAttributes['sessionCounter'] ? sessionAttributes['sessionCounter'] + 1 : 1;
-            // const episodes = Object.keys(sessionAttributes['history']['episodes'] || {}).reverse();
-            // if (episodes.length > 10){
-            //     for (let i = 10; i < episodes.length; i++) {
-            //         const episode = episodes[i]
-            //         delete sessionAttributes['history']['episodes'][episode];
-            //     }
-            // }
+            const episodes = Object.keys(sessionAttributes['history']['episodes'] || {}).reverse();
+            if (episodes.length > 10){
+                for (let i = 10; i < episodes.length; i++) {
+                    const episode = episodes[i]
+                    delete sessionAttributes['history']['episodes'][episode];
+                }
+            }
             // limiting save of session attributes to the ones we want to make persistent
             for (var key in sessionAttributes) {
                 if (!constants.PERSISTENT_ATTRIBUTES_NAMES.includes(key))

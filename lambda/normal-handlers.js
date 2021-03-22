@@ -23,14 +23,10 @@ const LaunchRequestHandler = {
 
     } else {
       playbackInfo.inPlaybackSession = false;
-      let description;
       const episodes = playlist['episodes'];
       const episode = episodes[playlistTokens[playbackInfo.index]]
-      if(playlist['type']==="channel"){
-        description = episode.title + ' from channel ' + playlist['name']
-      }else{
-        description = episode.title + ' from ' + playlist['name']
-      }
+      const {description} = util.getDescriptionSubtitleMessage(episode, playlist);
+      
       message = util.getResponseMessage('WELCOME_BACK_MSG', {description:description})
       reprompt = util.getResponseMessage('WELCOME_BACK_MSG_REPROMPT');
     }
@@ -114,10 +110,10 @@ const ErrorHandler = {
         console.log(`~~~~ Error handled: ${JSON.stringify(handlerInput)}`);
         console.log(`~~~~ Error handled: ${JSON.stringify(error)}`);
 
-        return handlerInput.responseBuilder
-            .speak(error.toString())
-            .reprompt(util.getResponseMessage('REPROMPT_MSG'))
-            .getResponse();
+        // return handlerInput.responseBuilder
+        //     .speak(error.toString())
+        //     .reprompt(util.getResponseMessage('REPROMPT_MSG'))
+        //     .getResponse();
     }
 };
 

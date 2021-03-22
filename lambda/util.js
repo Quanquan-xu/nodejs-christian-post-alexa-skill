@@ -227,6 +227,25 @@ module.exports = {
     getResponseMessage(...args){
         return localisationClient.localise(...args);
     },
+    getDescriptionSubtitleMessage(eposide,playlist){
+        let description;
+        let subtitle;
+    
+        if(playlist['type'] ==="channel"){
+            description = eposide.title + " from  channel " + playlist['name'];
+            subtitle = playlist['name'];
+        }else{
+            if(playlist['name'].includes("search")){
+                description = eposide.title + " from " + eposide["channelName"];
+                subtitle = eposide["channelName"];
+            }else{
+                //const subtitle = await logic.fetchChannelNameByEpisodeID(token)
+                description = eposide.title + " from " + playlist['name'];
+                subtitle = playlist['name'].charAt(0).toUpperCase() + playlist['name'].slice(1) ;  
+            }
+        }
+        return {description, subtitle}
+    },
     getResumeMessageResponse(episode,playlist,handlerInput){
         let description;
         if(playlist['type']==="channel"){
@@ -247,14 +266,14 @@ module.exports = {
             .reprompt(reprompt)
             .getResponse();
     },
-    // removeResumeHistoryEpisode(playbackInfo, history){
-    //     if(history.resume){
-    //         const token = playbackInfo.token;
-    //         const episodes = history['episodes'];
-    //         if(episodes.includes(token)){
-    //             delete history['episodes'][token]
-    //         }
-    //         history.resume = false
-    //     }
-    // }
+    removeResumeHistoryEpisode(playbackInfo, history){
+        if(history.resume){
+            const token = playbackInfo.token;
+            const episodes = history['episodes'];
+            if(episodes.includes(token)){
+                delete history['episodes'][token]
+            }
+            history.resume = false
+        }
+    }
 }

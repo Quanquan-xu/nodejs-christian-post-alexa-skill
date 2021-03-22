@@ -27,9 +27,9 @@ module.exports = {
             newSessionAttributes['updatedAt'] = Date.now();
             newSessionAttributes['lastestEposides'] = lastestEposides;
             newSessionAttributes['recommendedChannels'] = recommendedChannels;
-            if(!playlist || (playlist["type"] ==="episodes" && playlist['name'] === "promotion episodes")){
+            if(!playlist || (playlist["type"] ==="episode" && playlist['name'] === "promotion episodes")){
                 newSessionAttributes['playlist'] = {
-                    type: "episodes",
+                    type: "episode",
                     name: "promotion episodes",
                     episodes:lastestEposides
                 }
