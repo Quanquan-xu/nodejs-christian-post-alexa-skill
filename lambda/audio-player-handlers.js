@@ -295,25 +295,31 @@ const AudioPlayerEventHandler = {
           const playBehavior = 'ENQUEUE';
           const podcast = playlist['episodes'][enqueueToken];
           const expectedPreviousToken = playbackInfo.token;
-          const offsetInMilliseconds = 0;
-          Object.assign(history["episodes"], {[token]:0});
 
-          const {subtitle} = util.getDescriptionSubtitleMessage(podcast, playlist);
-          const backgroundImage = constants.IMAGES["backgroundImage"]
-          const metadata = {
-            title: podcast.title,
-            subtitle: subtitle,
-            art: new Alexa.ImageHelper().addImageInstance(podcast.imageUrl).getImage(),
-            backgroundImage: new Alexa.ImageHelper().addImageInstance(backgroundImage).getImage()
+          let {message, metadata, cardTitle, cardSubtitle} = util.getResponseMetadata(podcast,playlist,1,1)
+
+          let offsetInMilliseconds = 0;
+          let historyOffsetInMilliseconds = history["episodes"][enqueueToken]
+          if(historyOffsetInMilliseconds && parseInt(historyOffsetInMilliseconds) >= 6000){
+              offsetInMilliseconds = parseInt(historyOffsetInMilliseconds) - 5000;
+              message = message + "Last time, You have heard around {{minute}} minutes"
           }
-          responseBuilder.addAudioPlayerPlayDirective(
-            playBehavior,
-            podcast.audioUrl,
-            enqueueToken,
-            offsetInMilliseconds,
-            expectedPreviousToken,
-            metadata
+          responseBuilder.withStandardCard(
+              cardTitle,
+              cardSubtitle,
+              constants.IMAGES.standardCardSmallImageUrl,
+              constants.IMAGES.standardCardLargeImageUrl
           );
+          responseBuilder
+            .speak(util.speakSafeText(message))
+            .addAudioPlayerPlayDirective(
+              playBehavior,
+              podcast.audioUrl,
+              enqueueToken,
+              offsetInMilliseconds,
+              expectedPreviousToken,
+              metadata
+            );
           break;
         }
       case 'PlaybackFailed':
@@ -605,48 +611,31 @@ const controller = {
     const playBehavior = 'REPLACE_ALL';
     const token = playlistTokens[index];
     const podcast = playlist['episodes'][token];
-
     playbackInfo.token = token;
-    console.log("history-offsetInMilliseconds", history['episodes'])
-    
-    if(history['episodes'][token] && history['episodes'][token] > 30000){
-        
+
+    if(history['episodes'][token] && history['episodes'][token] > 60000){
         history.resume = true;
         playbackInfo.offsetInMilliseconds = parseInt(history['episodes'][token]) - 5000;
-        console.log("offsetInMilliseconds", token)
-        console.log("offsetInMilliseconds", history['episodes'][token])
-        return util.getResumeMessageResponse(podcast,playlist,handlerInput)
+        return util.getResumeMessageResponse(podcast,playlist, parseInt(history['episodes'][token], handlerInput)
     }
 
     playbackInfo.nextStreamEnqueued = false;
 
-    const {description,subtitle} = util.getDescriptionSubtitleMessage(podcast, playlist);
+    const {message, metadata, cardTitle, cardSubtitle} = util.getResponseMetadata(podcast,playlist,index,sessionCounter)
 
-    let message = util.getResponseMessage('START_PLAYING_MSG', {description: description});
-    if(index % 5 === 0 && (!sessionCounter || sessionCounter % 10 === 0)){
-        message = message + util.getResponseMessage('START_PLAYING_HELP_MSG')
-    }
-
-    const backgroundImage = constants.IMAGES["backgroundImage"]
-    const metadata = {
-        title: podcast.title,
-        subtitle: subtitle,
-        art: new Alexa.ImageHelper().addImageInstance(podcast.imageUrl).getImage(),
-        backgroundImage: new Alexa.ImageHelper().addImageInstance(backgroundImage).getImage()
-    }
-    const cardTitle = description;
-
-    const cardSubtitle = util.getResponseMessage('START_PLAYING_HELP_MSG');
     responseBuilder.withStandardCard(
         cardTitle,
-        util.getResponseMessage('START_PLAYING_HELP_MSG'),
+        cardSubtitle,
         constants.IMAGES.standardCardSmallImageUrl,
         constants.IMAGES.standardCardLargeImageUrl
     );
+    if(!history.resume){
+        responseBuilder.speak(util.speakSafeText(message));
+    }
+    history.resume = false
     responseBuilder
-      .speak(util.speakSafeText(message))
       .withShouldEndSession(true)
-      .addAudioPlayerPlayDirective(playBehavior, podcast.audioUrl, token, offsetInMilliseconds, null,metadata);
+      .addAudioPlayerPlayDirective(playBehavior, podcast.audioUrl, token, offsetInMilliseconds, null, metadata);
     return responseBuilder.getResponse();
   },
   stop(handlerInput) {

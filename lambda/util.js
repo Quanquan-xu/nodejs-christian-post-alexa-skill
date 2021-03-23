@@ -227,6 +227,23 @@ module.exports = {
     getResponseMessage(...args){
         return localisationClient.localise(...args);
     },
+    getResponseMetadata(podcast, playlist, index, sessionCounter){
+        const {description,subtitle} = this.getDescriptionSubtitleMessage(podcast, playlist);
+        let message = this.getResponseMessage('START_PLAYING_MSG', {description: description});
+        if(index % 5 === 0 && (!sessionCounter || sessionCounter % 7 === 0)){
+            message = message + this.getResponseMessage('START_PLAYING_HELP_MSG')
+        }
+        const backgroundImage = constants.IMAGES["backgroundImage"]
+        const metadata = {
+            title: podcast.title,
+            subtitle: subtitle,
+            art: new Alexa.ImageHelper().addImageInstance(podcast.imageUrl).getImage(),
+            backgroundImage: new Alexa.ImageHelper().addImageInstance(backgroundImage).getImage()
+        }
+        const cardTitle = description;
+        const cardSubtitle = util.getResponseMessage('START_PLAYING_HELP_MSG');
+        return {message, metadata, cardTitle, cardSubtitle}
+    },
     getDescriptionSubtitleMessage(eposide,playlist){
         let description;
         let subtitle;
@@ -246,14 +263,18 @@ module.exports = {
         }
         return {description, subtitle}
     },
-    getResumeMessageResponse(episode,playlist,handlerInput){
-        let description;
-        if(playlist['type']==="channel"){
-            description = episode.title + ' from channel ' + playlist['name']
-        }else{
-            description = episode.title + ' from ' + playlist['name']
+    getResumeMessageResponse(episode,playlist, offsetInMilliseconds, handlerInput){
+        const {description} = this.getDescriptionSubtitleMessage(episode,playlist);
+        const minute = parseInt(offsetInMilliseconds / 60000) ;
+        const second = parseInt((offsetInMilliseconds % 60000) / 1000);
+        let time = '' ;
+        if(minute){
+            time += `${minute} minutes `
         }
-        const message = this.getResponseMessage('START_PLAYING_RESUME_MSG', {description:description})
+        if(second >= 10){
+            time += `${second} seconds `
+        }
+        const message = this.getResponseMessage('START_PLAYING_RESUME_MSG', {description:description, time:time})
         const reprompt = this.getResponseMessage('START_PLAYING_RESUME_MSG_REPROMPT');
         handlerInput.responseBuilder.withStandardCard(
             this.speakSafeText(message),
@@ -273,7 +294,7 @@ module.exports = {
             if(episodes.includes(token)){
                 delete history['episodes'][token]
             }
-            history.resume = false
+            //history.resume = false
         }
     }
 }
