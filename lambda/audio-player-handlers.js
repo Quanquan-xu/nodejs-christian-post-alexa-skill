@@ -3,6 +3,7 @@ const constants = require('./constants');
 const util = require('./util'); // utility functions
 const logic = require('./logic');
 
+
 // playlist and contents logic handlers
 
 const SayListIntentHandler = {
@@ -34,16 +35,8 @@ const SayListIntentHandler = {
             const playlist = sessionAttributes['playlist']
             messages = util.getSayPlaylistMessages(playlist, handlerInput);
       }
-      handlerInput.responseBuilder.withStandardCard(
-          messages.cardTitle,
-          messages.cardSubtitle,
-          constants.IMAGES.standardCardSmallImageUrl,
-          constants.IMAGES.standardCardLargeImageUrl
-      );
-      return handlerInput.responseBuilder
-          .speak(util.speakSafeText(messages.message))
-          .reprompt(util.getResponseMessage('REPROMPT_MSG'))
-          .getResponse();
+      const reprompt = util.getResponseMessage('REPROMPT_MSG');
+      return util.formatResponseBuilder(messages.cardTitle, messages.cardSubtitle, messages.message, reprompt, handlerInput);
     }
     return handlerInput.responseBuilder
       .speak(util.getResponseMessage('ERROR_MSG'))
@@ -62,16 +55,9 @@ const SayRecommendedChannelsHandler = {
     sessionAttributes['isSearchedChannels'] = false
     let messages = {};
     messages = util.getSayChannelsMessages(channels,handlerInput);
-      handlerInput.responseBuilder.withStandardCard(
-          messages.cardTitle,
-          messages.cardSubtitle,
-          constants.IMAGES.standardCardSmallImageUrl,
-          constants.IMAGES.standardCardLargeImageUrl
-      );
-      return handlerInput.responseBuilder
-          .speak(util.speakSafeText(messages.message))
-          .reprompt(util.getResponseMessage('REPROMPT_MSG'))
-          .getResponse();
+    
+    const reprompt = util.getResponseMessage('REPROMPT_MSG');
+    return util.formatResponseBuilder(messages.cardTitle, messages.cardSubtitle, messages.message, reprompt, handlerInput);
     }
 };
 const PlayChannelIntentHandler = {
@@ -79,7 +65,7 @@ const PlayChannelIntentHandler = {
     return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' && Alexa.getIntentName(handlerInput.requestEnvelope) === 'PlayChannel';
   },
   async handle(handlerInput) {
-    const {attributesManager, requestEnvelope, responseBuilder} = handlerInput;
+    const {attributesManager, requestEnvelope} = handlerInput;
     const {recommendedChannels,searchedChannels,isSearchedChannels} = attributesManager.getSessionAttributes();
     const channelNum = Alexa.getSlotValue(requestEnvelope, 'number');
     let availableChannels = recommendedChannels;
@@ -109,15 +95,13 @@ const PlayChannelIntentHandler = {
                 return controller.play(handlerInput);
             }
         }
-        return responseBuilder
-          .speak(util.getResponseMessage('INDEX_ERROR_MSG',{name:"channel", number: channelNum}))
-          .reprompt(util.getResponseMessage('REPROMPT_MSG'))
-          .getResponse();
+        const message = util.getResponseMessage('INDEX_ERROR_MSG',{name:"channel", number: channelNum});
+        const reprompt = util.getResponseMessage('REPROMPT_MSG');
+        return util.formatResponseBuilder(message, reprompt, message, reprompt, handlerInput);
     }
-    return responseBuilder
-      .speak(util.getResponseMessage('API_ERROR_MSG'))
-      .reprompt(util.getResponseMessage('REPROMPT_MSG'))
-      .getResponse();
+    const message = util.getResponseMessage('API_ERROR_MSG');
+    const reprompt = util.getResponseMessage('REPROMPT_MSG');
+    return util.formatResponseBuilder(message, reprompt, message, reprompt, handlerInput);
     }
 };
 const PlayEpisodeIntentHandler = {
@@ -125,7 +109,7 @@ const PlayEpisodeIntentHandler = {
     return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' && Alexa.getIntentName(handlerInput.requestEnvelope) === 'PlayEpisode';
   },
   async handle(handlerInput) {
-    const {requestEnvelope, responseBuilder} = handlerInput;
+    const {requestEnvelope} = handlerInput;
     const episodeNum = Alexa.getSlotValue(requestEnvelope, 'number');
 
     if(episodeNum){
@@ -138,16 +122,14 @@ const PlayEpisodeIntentHandler = {
             playbackInfo.hasPreviousPlaybackSession = true;
             return controller.play(handlerInput);
         }else{
-            return responseBuilder
-              .speak(util.getResponseMessage('INDEX_ERROR_MSG',{name:"episode", number: episodeNum}))
-              .reprompt(util.getResponseMessage('REPROMPT_MSG'))
-              .getResponse();
+            const message =util.getResponseMessage('INDEX_ERROR_MSG',{name:"episode", number: episodeNum});
+            const reprompt = util.getResponseMessage('REPROMPT_MSG');
+            return util.formatResponseBuilder(message, reprompt, message, reprompt, handlerInput);
         }
     }
-    return responseBuilder
-      .speak(util.getResponseMessage('ERROR_MSG'))
-      .reprompt(util.getResponseMessage('REPROMPT_MSG'))
-      .getResponse();
+    const message = util.getResponseMessage('API_ERROR_MSG');
+    const reprompt = util.getResponseMessage('REPROMPT_MSG');
+    return util.formatResponseBuilder(message, reprompt, message, reprompt, handlerInput);
     }
 };
 const PlayPromotionEpisodesIntentHandler = {
@@ -198,23 +180,12 @@ const SaySearchResultIntentHandler = {
             }
 
             const {message, cardTitle, cardSubtitle} = await logic.fetchSearchResults(keywords,scope,handlerInput);
-
-            handlerInput.responseBuilder.withStandardCard(
-                cardTitle,
-                cardSubtitle,
-                constants.IMAGES.standardCardSmallImageUrl,
-                constants.IMAGES.standardCardLargeImageUrl
-            );
-
-            return handlerInput.responseBuilder
-                .speak(util.speakSafeText(message))
-                .reprompt(util.getResponseMessage('REPROMPT_MSG'))
-                .getResponse();
+            const reprompt = util.getResponseMessage('REPROMPT_MSG');
+            return util.formatResponseBuilder(cardTitle, cardSubtitle, message, reprompt, handlerInput);
         }
-        return handlerInput.responseBuilder
-            .speak(util.getResponseMessage('SEARCH_CONFIRMATION_REJECTED_MSG', {name: requestScope ? requestScope : "channels or episodes"}))
-            .reprompt(util.getResponseMessage('REPROMPT_MSG'))
-            .getResponse();
+        const message = util.getResponseMessage('SEARCH_CONFIRMATION_REJECTED_MSG', {name: requestScope ? requestScope : "channels or episodes"});
+        const reprompt = util.getResponseMessage('REPROMPT_MSG');
+        return util.formatResponseBuilder(message, reprompt, message, reprompt, handlerInput);
     }
 };
 
@@ -296,22 +267,14 @@ const AudioPlayerEventHandler = {
           const podcast = playlist['episodes'][enqueueToken];
           const expectedPreviousToken = playbackInfo.token;
 
-          let {message, metadata, cardTitle, cardSubtitle} = util.getResponseMetadata(podcast,playlist,1,1)
+          const {metadata} = util.getResponseMetadata(podcast,playlist,1,1)
 
           let offsetInMilliseconds = 0;
-          let historyOffsetInMilliseconds = history["episodes"][enqueueToken]
-          if(historyOffsetInMilliseconds && parseInt(historyOffsetInMilliseconds) >= 6000){
-              offsetInMilliseconds = parseInt(historyOffsetInMilliseconds) - 5000;
-              message = message + "Last time, You have heard around {{minute}} minutes"
-          }
-          responseBuilder.withStandardCard(
-              cardTitle,
-              cardSubtitle,
-              constants.IMAGES.standardCardSmallImageUrl,
-              constants.IMAGES.standardCardLargeImageUrl
-          );
+        //   let historyOffsetInMilliseconds = history["episodes"][enqueueToken]
+        //   if(historyOffsetInMilliseconds && parseInt(historyOffsetInMilliseconds) >= 6000){
+        //       offsetInMilliseconds = parseInt(historyOffsetInMilliseconds) - 5000;
+        //   }
           responseBuilder
-            .speak(util.speakSafeText(message))
             .addAudioPlayerPlayDirective(
               playBehavior,
               podcast.audioUrl,
@@ -513,7 +476,7 @@ const NoHandler = {
   async handle(handlerInput) {
     const {playbackInfo, history} = handlerInput.attributesManager.getSessionAttributes();
     if(!history.resume){
-        playbackInfo.index = 0;
+        return util.getStartResumeNoResponse(handlerInput)
     }
     util.removeResumeHistoryEpisode(playbackInfo, history)
     playbackInfo.offsetInMilliseconds = 0;
@@ -616,7 +579,7 @@ const controller = {
     if(history['episodes'][token] && history['episodes'][token] > 60000){
         history.resume = true;
         playbackInfo.offsetInMilliseconds = parseInt(history['episodes'][token]) - 5000;
-        return util.getResumeMessageResponse(podcast,playlist, parseInt(history['episodes'][token], handlerInput)
+        return util.getResumeMessageResponse(podcast,playlist, parseInt(history['episodes'][token]), handlerInput)
     }
 
     playbackInfo.nextStreamEnqueued = false;

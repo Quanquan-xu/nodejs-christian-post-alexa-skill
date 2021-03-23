@@ -32,6 +32,7 @@ module.exports = {
             API_ERROR_MSG: `I'm sorry, I'm having trouble accessing the external A.P.I., Please try again later. `,
             INDEX_ERROR_MSG: `Oops! {{}} {{}} doesn't exist，you can try a smaller number. `,
             SEARCH_CONFIRMATION_REJECTED_MSG: `Ok, never mind! At any time, you can say Alexa, search {{name}} to search.`,
+            START_NO_RESUME_RESPONSE_MSG: `Ok, never mind! At any time, you can say Alexa, play promotion episodes, to play lastest promotion episodes. Or say, Alexa, channel list, to check recommended channels. You can also say, Alexa, search, to search channels or episodes. What would you like to do next? `,
 
         }
     }

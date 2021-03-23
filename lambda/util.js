@@ -1,4 +1,5 @@
 const AWS = require('aws-sdk');
+const Alexa = require('ask-sdk-core');
 const i18n = require('i18next');
 const languageStrings = require('./localisation');
 const constants = require('./constants');
@@ -241,7 +242,7 @@ module.exports = {
             backgroundImage: new Alexa.ImageHelper().addImageInstance(backgroundImage).getImage()
         }
         const cardTitle = description;
-        const cardSubtitle = util.getResponseMessage('START_PLAYING_HELP_MSG');
+        const cardSubtitle = this.getResponseMessage('START_PLAYING_HELP_MSG');
         return {message, metadata, cardTitle, cardSubtitle}
     },
     getDescriptionSubtitleMessage(eposide,playlist){
@@ -276,25 +277,30 @@ module.exports = {
         }
         const message = this.getResponseMessage('START_PLAYING_RESUME_MSG', {description:description, time:time})
         const reprompt = this.getResponseMessage('START_PLAYING_RESUME_MSG_REPROMPT');
+        return this.formatResponseBuilder(message,reprompt,message,reprompt,handlerInput);
+    },
+    removeResumeHistoryEpisode(playbackInfo, history){
+        const token = playbackInfo.token;
+        const episodes = Object.keys(history['episodes']);
+        if(episodes.includes(token)){
+            delete history['episodes'][token]
+        }
+    },
+    getStartResumeNoResponse(handlerInput){
+        const message = this.getResponseMessage('START_NO_RESUME_RESPONSE_MSG');
+        const reprompt = this.getResponseMessage('REPROMPT_MSG');
+        return this.formatResponseBuilder(message, reprompt, message, reprompt, handlerInput);
+    },
+    formatResponseBuilder(cardTitle,cardSubtitle, message, reprompt, handlerInput){
         handlerInput.responseBuilder.withStandardCard(
-            this.speakSafeText(message),
-            reprompt,
+            this.speakSafeText(cardTitle),
+            cardSubtitle,
             constants.IMAGES.standardCardSmallImageUrl,
             constants.IMAGES.standardCardLargeImageUrl
         );
         return handlerInput.responseBuilder
             .speak(this.speakSafeText(message))
-            .reprompt(reprompt)
+            .reprompt(this.speakSafeText(reprompt))
             .getResponse();
-    },
-    removeResumeHistoryEpisode(playbackInfo, history){
-        if(history.resume){
-            const token = playbackInfo.token;
-            const episodes = Object.keys(history['episodes']);
-            if(episodes.includes(token)){
-                delete history['episodes'][token]
-            }
-            //history.resume = false
-        }
     }
 }

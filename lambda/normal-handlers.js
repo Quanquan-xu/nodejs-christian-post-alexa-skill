@@ -13,7 +13,7 @@ const LaunchRequestHandler = {
     return Alexa.getRequestType(handlerInput.requestEnvelope) === 'LaunchRequest';
   },
   async handle(handlerInput) {
-    const {playbackInfo,playlistTokens,playlist} = handlerInput.attributesManager.getSessionAttributes();
+    const {playbackInfo,playlistTokens,playlist,history} = handlerInput.attributesManager.getSessionAttributes();
     let message;
     let reprompt;
 
@@ -28,16 +28,7 @@ const LaunchRequestHandler = {
         message = util.getResponseMessage('WELCOME_BACK_MSG', {description:description})
         reprompt = util.getResponseMessage('WELCOME_BACK_MSG_REPROMPT');
     }
-    handlerInput.responseBuilder.withStandardCard(
-        util.speakSafeText(message),
-        reprompt,
-        constants.IMAGES.standardCardSmallImageUrl,
-        constants.IMAGES.standardCardLargeImageUrl
-    );
-    return handlerInput.responseBuilder
-      .speak(util.speakSafeText(message))
-      .reprompt(reprompt)
-      .getResponse();
+    return util.formatResponseBuilder(message,reprompt,message,reprompt,handlerInput);
   },
 };
 
