@@ -103,7 +103,7 @@ module.exports = {
                     const source = util.getFormatedEpisode(eposide, image, channelName)
                     return Object.assign(accumulator, source)
                 }, {});
-                const {playlist} = util.setPlaylist("episode", "search episodes", searchedEposides,sessionAttributes)
+                const {playlist} = util.setPlaylist("episode", "search episodes", searchedEposides, sessionAttributes)
                 return util.getSayPlaylistMessages(playlist,handlerInput);
             }
         }).catch((error) => {

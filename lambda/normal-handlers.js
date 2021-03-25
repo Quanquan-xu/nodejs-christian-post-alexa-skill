@@ -17,7 +17,10 @@ const LaunchRequestHandler = {
     let message;
     let reprompt;
 
-    if (!playbackInfo.hasPreviousPlaybackSession) {
+    if (!playbackInfo.hasPreviousPlaybackSession || playbackInfo.index < 0) {
+        if(playbackInfo.index < 0){
+            playbackInfo.index = 0;
+        }
         message = util.getResponseMessage('WELCOME_MSG');
         reprompt = util.getResponseMessage('WELCOME_MSG_REPROMPT');
     } else {
@@ -79,7 +82,7 @@ const IntentReflectorHandler = {
     handle(handlerInput) {
         return handlerInput.responseBuilder
         .speak(util.getResponseMessage('REPROMPT_MSG'))
-        //.reprompt(util.getResponseMessage('REPROMPT_MSG'))
+        .reprompt(util.getResponseMessage('REPROMPT_MSG'))
         .getResponse();
     }
 };

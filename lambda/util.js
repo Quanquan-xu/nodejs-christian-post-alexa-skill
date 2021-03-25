@@ -231,7 +231,7 @@ module.exports = {
     getResponseMetadata(podcast, playlist, index, sessionCounter){
         const {description,subtitle} = this.getDescriptionSubtitleMessage(podcast, playlist);
         let message = this.getResponseMessage('START_PLAYING_MSG', {description: description});
-        if(index % 5 === 0 && (!sessionCounter || sessionCounter % 7 === 0)){
+        if(index % 5 === 0 && (!sessionCounter || sessionCounter <= 3 || sessionCounter % 7 === 0)){
             message = message + this.getResponseMessage('START_PLAYING_HELP_MSG')
         }
         const backgroundImage = constants.IMAGES["backgroundImage"]

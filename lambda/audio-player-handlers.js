@@ -476,6 +476,7 @@ const NoHandler = {
   async handle(handlerInput) {
     const {playbackInfo, history} = handlerInput.attributesManager.getSessionAttributes();
     if(!history.resume){
+        playbackInfo.inPlaybackSession = true
         return util.getStartResumeNoResponse(handlerInput)
     }
     util.removeResumeHistoryEpisode(playbackInfo, history)
@@ -504,29 +505,17 @@ const HelpHandler = {
 
     if (!playbackInfo.hasPreviousPlaybackSession && (!sessionCounter || sessionCounter % 7 === 0)) {
         message += util.getResponseMessage('BUILT_IN_HELP_WEL_VERSE') + util.getResponseMessage('HELP_IN_QUESTION_MSG',{number1:(Math.floor(Math.random() * 10) + 1), number2: (Math.floor(Math.random() * 10) + 1)});
-    } else if (!playbackInfo.inPlaybackSession) {
+        message += util.getResponseMessage('HELP_IN_SEARCH_MSG');
+    } else if (!playbackInfo.inPlaybackSession && (sessionCounter % 3 === 0)) {
         const episode = playlist['episodes'][playlistTokens[playbackInfo.index]];
         const {description, subtitle} = util.getDescriptionSubtitleMessage(episode, playlist);
         message += util.getResponseMessage('HELP_IN_LISENING_MSG', {description: description});
     } else {
-      const isSaySample = (Math.floor(Math.random() * 10) + 1) >= 8;
-      let also = '';
-      if(isSaySample){
-        message += util.getResponseMessage('HELP_IN_COMING_BACK_SAMPLE_MSG');
-        also = 'also';
-      }
-      message += util.getResponseMessage('HELP_IN_QUESTION_MSG',{also: also, number1:(Math.floor(Math.random() * 10) + 1), number2: (Math.floor(Math.random() * 10) + 1)});
+      message += util.getResponseMessage('HELP_IN_QUESTION_MSG',{number1:(Math.floor(Math.random() * 10) + 1), number2: (Math.floor(Math.random() * 10) + 1)});
+      message += util.getResponseMessage('HELP_IN_SEARCH_MSG');
     }
-    handlerInput.responseBuilder.withStandardCard(
-      message,
-      "",
-      constants.IMAGES.standardCardSmallImageUrl,
-      constants.IMAGES.standardCardLargeImageUrl
-    );
-    return handlerInput.responseBuilder
-      .speak(util.speakSafeText(message))
-      .reprompt(util.speakSafeText(message))
-      .getResponse();
+    
+    return util.formatResponseBuilder(message, "", message, message, handlerInput);
   },
 };
 
@@ -596,6 +585,7 @@ const controller = {
         responseBuilder.speak(util.speakSafeText(message));
     }
     history.resume = false
+    console.log("H2344444@#!!!!!!!!!#####", offsetInMilliseconds)
     responseBuilder
       .withShouldEndSession(true)
       .addAudioPlayerPlayDirective(playBehavior, podcast.audioUrl, token, offsetInMilliseconds, null, metadata);

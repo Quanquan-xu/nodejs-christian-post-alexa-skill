@@ -4,7 +4,7 @@ module.exports = {
             WELCOME_MSG: `Welcome to the Edifi Podcast. Edifi Podcast is a Christian-centric powerful podcast player, you can say, begin the podcast, to start, or say help, to check more functions! `,
             WELCOME_MSG_REPROMPT: 'You can say, begin the podcast, to start.',
             WELCOME_BACK_MSG: `You were listening to {{description}} . Would you like to resume?`,
-            WELCOME_BACK_MSG_REPROMPT: 'You can say yes to resume or no to play from the top.',
+            WELCOME_BACK_MSG_REPROMPT: 'You can say yes to resume or no to next step.',
             FALLBACK_MSG: `Sorry, I don't know about that. Please try again.`,
             REPROMPT_MSG: `If you're not sure what to do next try asking for help. If you want to leave just say stop. What would you like to do next? `,
             REFLECTOR_MSG: 'You just triggered {{intent}}',
@@ -12,8 +12,8 @@ module.exports = {
             DEVELOPING_MSG: 'Sorry, This feature is not currently supported!',
             BUILT_IN_HELP_WEL_VERSE:'The earth shall be full of the knowledge of the Lord as the waters cover the sea! Welcome to the Edifi Podcast! The Edifi Podcast is a collection of transformational and faith-inspiring podcasts. ',
             HELP_IN_LISENING_MSG: `You are listening to  {{description}} . You can say, Alexa, my playlist, to look through the playlist. You can also say, Alexa, channel list, to check recommended channels! Or say, Alexa, search channels or episodes, to search channels or episodes`,
-            HELP_IN_QUESTION_MSG: `You can {{also}} have channel or promotion episodes list by saying, Alexa, channel list , or Alexa, promotion episodes list. You can use number, instead of name by saying, Alexa, episode {{number1}} or channel {{number2}}, to start podcast. Or say, Alexa, search, to search channels or episodes`,
-            HELP_IN_COMING_BACK_SAMPLE_MSG: 'You can play podcast channel or episode by saying, alexa, play channel Pastor Rick\'s Daily Hope, or alexa, play Dr. Tony Evans\'s episodes. ',
+            HELP_IN_QUESTION_MSG: `You can have channel or promotion episodes list by saying, Alexa, channel list , or Alexa, promotion episodes list. You can use number, instead of name by saying, Alexa, episode {{number1}} or channel {{number2}}, to start podcast. `,
+            HELP_IN_SEARCH_MSG: ['You can also search channels or episodes by saying, alexa, search channels, or alexa, search episodes. ', 'Or say, Alexa, search, to search channels or episodes'],
             GOODBYE_MSG: ['Goodbye! ', 'So long! ', 'See you later! ', 'Cheers! '],
             PROGRESSIVE_MSG: 'Let me {{description}} ',
             START_PLAYING_MSG: `This is  {{description}} . `,
@@ -32,7 +32,7 @@ module.exports = {
             API_ERROR_MSG: `I'm sorry, I'm having trouble accessing the external A.P.I., Please try again later. `,
             INDEX_ERROR_MSG: `Oops! {{}} {{}} doesn't exist，you can try a smaller number. `,
             SEARCH_CONFIRMATION_REJECTED_MSG: `Ok, never mind! At any time, you can say Alexa, search {{name}} to search.`,
-            START_NO_RESUME_RESPONSE_MSG: `Ok, never mind! At any time, you can say Alexa, play promotion episodes, to play lastest promotion episodes. Or say, Alexa, channel list, to check recommended channels. You can also say, Alexa, search, to search channels or episodes. What would you like to do next? `,
+            START_NO_RESUME_RESPONSE_MSG: `Ok! At any time, you can say, Alexa, play promotion episodes, to play lastest promotion episodes. Or say, Alexa, channel list, to check recommended channels. You can also say, Alexa, search, to search channels or episodes. What would you like to do next? `,
 
         }
     }
