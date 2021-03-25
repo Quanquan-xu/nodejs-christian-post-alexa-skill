@@ -27,10 +27,10 @@ module.exports = {
             newSessionAttributes['updatedAt'] = Date.now();
             newSessionAttributes['lastestEposides'] = lastestEposides;
             newSessionAttributes['recommendedChannels'] = recommendedChannels;
-            if(!playlist || (playlist["type"] ==="episode" && playlist['name'] === "promotion episodes")){
+            if(!playlist || (playlist["type"] ==="episode" && playlist['name'] === "featured episodes")){
                 newSessionAttributes['playlist'] = {
                     type: "episode",
-                    name: "promotion episodes",
+                    name: "featured episodes",
                     episodes:lastestEposides
                 }
                 const playlistTokens = Object.keys(lastestEposides);

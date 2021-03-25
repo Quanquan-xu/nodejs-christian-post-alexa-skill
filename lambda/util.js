@@ -130,7 +130,7 @@ module.exports = {
                 cardTitle += 'Episode ' + (index + 1) + " : " + episode.title + ";  "
             });
         }else{
-            if(playlist['name'].includes("promotion")){
+            if(playlist['name'].includes("featured")){
                 message = handlerInput.t('LIST_PLAYLIST_NOTIFICATION_MSG_HEADER_FRO_PROMOTION', {length:maxLength})
                 Object.values(episodes).forEach(function(episode, index) {
                     cardTitle += 'Episode ' + (index + 1) + " : " + episode.title + ";  "
@@ -192,7 +192,7 @@ module.exports = {
           }
         }
         if(maxLength > 5){
-            message += handlerInput.t('LIST_ONLY_TOP_FIVE_NOTIFICATION_MSG',{name:"lastest promotion episodes"});
+            message += handlerInput.t('LIST_ONLY_TOP_FIVE_NOTIFICATION_MSG',{name:"latest featured episodes"});
         }
         Object.values(episodes).filter( (ele,index) => index < 5 ).forEach(function(episode, index) {
           message += 'Episode ' + (index + 1) + " : " + episode.title + ";  "

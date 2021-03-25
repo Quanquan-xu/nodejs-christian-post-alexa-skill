@@ -27,7 +27,7 @@ const SayListIntentHandler = {
             sessionAttributes['isSearchedChannels'] = false
           }
 
-      }else if (queryName.toLowerCase().includes("lastest episode") || queryName.toLowerCase().includes("promotion")) {
+      }else if (queryName.toLowerCase().includes("latest episode") || queryName.toLowerCase().includes("promotion")) {
             const playlist = sessionAttributes['playlist'];
             const episodes = sessionAttributes['lastestEposides'];
             messages = util.getSayPromotionEpisodesMessages(episodes, playlist, handlerInput);
@@ -79,7 +79,7 @@ const PlayChannelIntentHandler = {
             const channelID = chosenChannel['id']
             const channelName = chosenChannel['title']
             try {
-                const description = `check channel ${channelName} lastest episodes! `;
+                const description = `check channel ${channelName} latest episodes! `;
                 await util.callDirectiveService(handlerInput, util.getResponseMessage('PROGRESSIVE_MSG', {description: description}));
             } catch (error) {
               // if it fails we can continue, but the user will wait without progressive response
@@ -140,7 +140,7 @@ const PlayPromotionEpisodesIntentHandler = {
     const {attributesManager, requestEnvelope, responseBuilder} = handlerInput;
     const {lastestEposides, playbackInfo} = attributesManager.getSessionAttributes();
     const sessionAttributes = attributesManager.getSessionAttributes();
-    const {playlistTokens} = util.setPlaylist("episode", "promotion episodes", lastestEposides, sessionAttributes)
+    const {playlistTokens} = util.setPlaylist("episode", "featured episodes", lastestEposides, sessionAttributes)
     playbackInfo.index = 0;
     playbackInfo.offsetInMilliseconds = 0;
     playbackInfo.playbackIndexChanged = true;
