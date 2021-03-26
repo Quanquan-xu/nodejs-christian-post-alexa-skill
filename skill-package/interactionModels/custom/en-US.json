@@ -1,7 +1,7 @@
 {
     "interactionModel": {
         "languageModel": {
-            "invocationName": "edifi podcast",
+            "invocationName": "edifi podcasts",
             "intents": [
                 {
                     "name": "AMAZON.CancelIntent",
@@ -19,6 +19,8 @@
                     "name": "PlayPodcast",
                     "slots": [],
                     "samples": [
+                        "begin",
+                        "start",
                         "begin podcast",
                         "begin the podcast",
                         "begin playing the podcast",
@@ -121,6 +123,7 @@
                             "name": "queryName",
                             "type": "queryLists",
                             "samples": [
+                                "see {queryName}",
                                 "{queryName} list",
                                 "list {queryName}",
                                 "{queryName}"
@@ -128,6 +131,8 @@
                         }
                     ],
                     "samples": [
+                        "see {queryName}",
+                        "see",
                         "list my {queryName}",
                         "my {queryName}",
                         "{queryName} playlist",
@@ -205,12 +210,14 @@
                             "name": "scope",
                             "type": "scope",
                             "samples": [
+                                "search for {scope}",
                                 "search {scope}",
                                 "{scope}"
                             ]
                         }
                     ],
                     "samples": [
+                        "search for {scope}",
                         "search podcast about {keywords}",
                         "search podcasts about {keywords}",
                         "search {keywords} podcast",
@@ -235,6 +242,8 @@
                         }
                     ],
                     "samples": [
+                        "search for episodes about {keywords}",
+                        "search for episode about {keywords}",
                         "search {keywords} episode",
                         "search {keywords} episodes",
                         "search episode {keywords}",
@@ -256,6 +265,8 @@
                         }
                     ],
                     "samples": [
+                        "search for channel about {keywords}",
+                        "search for channels about {keywords}",
                         "search {keywords} channels",
                         "search {keywords} channel",
                         "search channel about {keywords}",
@@ -268,6 +279,10 @@
                     "name": "SayRecommendedChannels",
                     "slots": [],
                     "samples": [
+                        "see recommended channels",
+                        "see recommended channels list",
+                        "see recommended channel list",
+                        "recommended channel list",
                         "play recommended channels",
                         "recommended channels list",
                         "recommended channel",
@@ -551,7 +566,7 @@
                 "variations": [
                     {
                         "type": "PlainText",
-                        "value": "channels, featured episodes, my playlist, which one do you want check list?"
+                        "value": "channels, featured episodes, my playlist, which one do you want to see the list?"
                     }
                 ]
             },
@@ -569,7 +584,7 @@
                 "variations": [
                     {
                         "type": "PlainText",
-                        "value": "Sorry, only value 'channels' ,  'featured episodes'  and 'my playlist' are acceptable , which one do you want check list?"
+                        "value": "Sorry, only value 'channels' ,  'featured episodes'  and 'my playlist' are acceptable , which one do you want to see the list?"
                     }
                 ]
             },
@@ -632,7 +647,7 @@
                 "variations": [
                     {
                         "type": "PlainText",
-                        "value": "Ok, got it ！Search {scope} about {keywords} , right?"
+                        "value": "Ok, got it ！Search for{scope} about {keywords} , right?"
                     }
                 ]
             },
@@ -668,7 +683,7 @@
                 "variations": [
                     {
                         "type": "PlainText",
-                        "value": "Ok, got it ！Search episodes about {keywords} , right?"
+                        "value": "Ok, got it ！Search for episodes about {keywords} , right?"
                     }
                 ]
             },
@@ -686,7 +701,7 @@
                 "variations": [
                     {
                         "type": "PlainText",
-                        "value": "Ok, got it ！Search channels about {keywords} , right?"
+                        "value": "Ok, got it ！Search for channels about {keywords} , right?"
                     }
                 ]
             },
