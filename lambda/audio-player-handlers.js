@@ -585,7 +585,7 @@ const controller = {
         responseBuilder.speak(util.speakSafeText(message));
     }
     history.resume = false
-    console.log("H2344444@#!!!!!!!!!#####", offsetInMilliseconds)
+    //console.log(`${token}----${offsetInMilliseconds}`)
     responseBuilder
       .withShouldEndSession(true)
       .addAudioPlayerPlayDirective(playBehavior, podcast.audioUrl, token, offsetInMilliseconds, null, metadata);
