@@ -10,7 +10,10 @@ const SayListIntentHandler = {
   canHandle(handlerInput) {
     return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' && Alexa.getIntentName(handlerInput.requestEnvelope) === 'SayList';
   },
-  handle(handlerInput) {
+  async handle(handlerInput) {
+      
+    await util.checkUpdateLatestResources(handlerInput);
+    
     const {attributesManager, requestEnvelope} = handlerInput;
     const sessionAttributes = attributesManager.getSessionAttributes();
     const queryName = Alexa.getSlotValue(requestEnvelope, 'queryName');
@@ -27,7 +30,7 @@ const SayListIntentHandler = {
             sessionAttributes['isSearchedChannels'] = false
           }
 
-      }else if (queryName.toLowerCase().includes("latest episode") || queryName.toLowerCase().includes("promotion")) {
+      }else if (queryName.toLowerCase().includes("latest episode") || queryName.toLowerCase().includes("promotion") || queryName.toLowerCase().includes("feature")) {
             const playlist = sessionAttributes['playlist'];
             const episodes = sessionAttributes['lastestEposides'];
             messages = util.getSayPromotionEpisodesMessages(episodes, playlist, handlerInput);
@@ -48,7 +51,10 @@ const SayRecommendedChannelsHandler = {
   canHandle(handlerInput) {
     return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' && Alexa.getIntentName(handlerInput.requestEnvelope) === 'SayRecommendedChannels';
   },
-  handle(handlerInput) {
+  async handle(handlerInput) {
+      
+    await util.checkUpdateLatestResources(handlerInput);
+    
     const {attributesManager, requestEnvelope} = handlerInput;
     const sessionAttributes = attributesManager.getSessionAttributes();
     const channels = sessionAttributes['recommendedChannels'];
@@ -65,6 +71,9 @@ const PlayChannelIntentHandler = {
     return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' && Alexa.getIntentName(handlerInput.requestEnvelope) === 'PlayChannel';
   },
   async handle(handlerInput) {
+      
+    await util.checkUpdateLatestResources(handlerInput);
+    
     const {attributesManager, requestEnvelope} = handlerInput;
     const {recommendedChannels,searchedChannels,isSearchedChannels} = attributesManager.getSessionAttributes();
     const channelNum = Alexa.getSlotValue(requestEnvelope, 'number');
@@ -104,11 +113,15 @@ const PlayChannelIntentHandler = {
     return util.formatResponseBuilder(message, reprompt, message, reprompt, handlerInput);
     }
 };
+
 const PlayEpisodeIntentHandler = {
   canHandle(handlerInput) {
     return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' && Alexa.getIntentName(handlerInput.requestEnvelope) === 'PlayEpisode';
   },
   async handle(handlerInput) {
+    
+    await util.checkUpdateLatestResources(handlerInput, true);
+    
     const {requestEnvelope} = handlerInput;
     const episodeNum = Alexa.getSlotValue(requestEnvelope, 'number');
 
@@ -132,11 +145,15 @@ const PlayEpisodeIntentHandler = {
     return util.formatResponseBuilder(message, reprompt, message, reprompt, handlerInput);
     }
 };
+
 const PlayPromotionEpisodesIntentHandler = {
   canHandle(handlerInput) {
     return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' && Alexa.getIntentName(handlerInput.requestEnvelope) === 'PlayPromotionEpisodes';
   },
   async handle(handlerInput) {
+      
+    await util.checkUpdateLatestResources(handlerInput);
+    
     const {attributesManager, requestEnvelope, responseBuilder} = handlerInput;
     const {lastestEposides, playbackInfo} = attributesManager.getSessionAttributes();
     const sessionAttributes = attributesManager.getSessionAttributes();
@@ -148,6 +165,7 @@ const PlayPromotionEpisodesIntentHandler = {
     return controller.play(handlerInput);
   }
 };
+
 const SaySearchResultIntentHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
@@ -313,7 +331,10 @@ const StartPlaybackHandler = {
         Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.ResumeIntent';
     }
   },
-  handle(handlerInput) {
+  async handle(handlerInput) {
+      
+    await util.checkUpdateLatestResources(handlerInput, true);
+    
     return controller.play(handlerInput);
   },
 };

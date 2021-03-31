@@ -16,6 +16,7 @@ module.exports = {
             HELP_IN_SEARCH_MSG: ['You can also search channels or episodes by saying, Alexa, search channels, or Alexa, search episodes. ', 'Or say, Alexa, search, to search channels or episodes. '],
             GOODBYE_MSG: ['Goodbye! ', 'So long! ', 'See you later! ', 'Cheers! '],
             PROGRESSIVE_MSG: 'Let me {{description}} ',
+            UPDATELATEST_RESOURCES_PROGRESSIVE_MSG: ['OK! Let me first update latest resources for you... ', 'Got it! Let me first update latest resources for you...  ', 'No Problem! Let me first update latest resources for you... '],
             START_PLAYING_MSG: `This is  {{description}} . `,
             START_PLAYING_RESUME_MSG: `Last time, You have heard {{description}} around {{time}}. Would you like to resume? `,
             START_PLAYING_RESUME_MSG_REPROMPT: 'You can say yes to resume or no to play from the beigining.',

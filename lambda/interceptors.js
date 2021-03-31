@@ -45,11 +45,6 @@ const LoadAttributesRequestInterceptor = {
                   }
                 }
             }
-            if(!persistentAttributes['updatedAt'] || persistentAttributes['updatedAt'] < ( Date.now() - 4 * 1000 * 3600)){
-              const newSessionAttributes = await logic.fetchLastestEposides(persistentAttributes['playlist']);
-              persistentAttributes = Object.assign(persistentAttributes, newSessionAttributes)
-
-            }
             console.log('Loading from persistent storage: ' + JSON.stringify(persistentAttributes));
             persistentAttributes['loaded'] = true;
             persistentAttributes['history']['resume'] = false;

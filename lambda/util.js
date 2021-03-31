@@ -3,6 +3,7 @@ const Alexa = require('ask-sdk-core');
 const i18n = require('i18next');
 const languageStrings = require('./localisation');
 const constants = require('./constants');
+const logic = require('./logic');
 
 
 const s3SigV4Client = new AWS.S3({
@@ -302,5 +303,21 @@ module.exports = {
             .speak(this.speakSafeText(message))
             .reprompt(this.speakSafeText(reprompt))
             .getResponse();
+    },
+    async checkUpdateLatestResources(handlerInput,isToPlayEpisode=false){
+        const {attributesManager, requestEnvelope} = handlerInput;
+        if(Alexa.getRequestType(handlerInput.requestEnvelope).startsWith('AudioPlayer.')) return;
+        let sessionAttributes = attributesManager.getSessionAttributes();
+        if(!sessionAttributes['updatedAt'] || (sessionAttributes['updatedAt'] < ( Date.now() - 4 * 1000 * 3600) && !isToPlayEpisode)){
+            try {
+                await this.callDirectiveService(handlerInput, this.getResponseMessage('UPDATELATEST_RESOURCES_PROGRESSIVE_MSG'));
+            } catch (error) {
+              // if it fails we can continue, but the user will wait without progressive response
+              console.log("Progressive response directive error : " + error);
+            }
+            const newSessionAttributes = await logic.fetchLastestEposides(sessionAttributes['playlist']);
+            sessionAttributes = Object.assign(sessionAttributes, newSessionAttributes)
+            attributesManager.setSessionAttributes(sessionAttributes);
+        }
     }
 }
