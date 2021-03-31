@@ -297,6 +297,26 @@
                     "values": [
                         {
                             "name": {
+                                "value": "feature episode"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "feature episodes"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "featured episode"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "featured episodes"
+                            }
+                        },
+                        {
+                            "name": {
                                 "value": "promotion episodes"
                             }
                         },
@@ -312,12 +332,12 @@
                         },
                         {
                             "name": {
-                                "value": "lastest episodes"
+                                "value": "latest episodes"
                             }
                         },
                         {
                             "name": {
-                                "value": "lastest episode"
+                                "value": "latest episode"
                             }
                         },
                         {
