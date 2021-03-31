@@ -1,9 +1,9 @@
 
 /* *
- * This sample demonstrates handling intents from an Alexa skill using the Alexa Skills Kit SDK (v2).
- * Please visit https://alexa.design/cookbook for additional examples on implementing slots, dialog management,
- * session persistence, api calls, and more.
+ * By The Christian Post.
+ * The earth shall be full of the knowledge of the Lord as the waters cover the sea! Isaiah 11:9
  * */
+ 
 const Alexa = require('ask-sdk-core');
 const util = require('./util'); // utility functions
 const interceptors = require('./interceptors');
@@ -54,3 +54,9 @@ exports.handler = skillBuilder
   .withApiClient(new Alexa.DefaultApiClient())
   .withCustomUserAgent('sample/hello-world/v1.2')
   .lambda();
+  
+  
+  /* *
+ * STANDARD FOOTER:
+ * The earth shall be full of the knowledge of the Lord as the waters cover the sea! Isaiah 11:9
+ * */

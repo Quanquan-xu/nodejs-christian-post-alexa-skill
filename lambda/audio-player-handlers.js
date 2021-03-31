@@ -12,7 +12,7 @@ const SayListIntentHandler = {
   },
   async handle(handlerInput) {
       
-    await util.checkUpdateLatestResources(handlerInput);
+    await logic.checkUpdateLatestResources(handlerInput);
     
     const {attributesManager, requestEnvelope} = handlerInput;
     const sessionAttributes = attributesManager.getSessionAttributes();
@@ -53,7 +53,7 @@ const SayRecommendedChannelsHandler = {
   },
   async handle(handlerInput) {
       
-    await util.checkUpdateLatestResources(handlerInput);
+    await logic.checkUpdateLatestResources(handlerInput);
     
     const {attributesManager, requestEnvelope} = handlerInput;
     const sessionAttributes = attributesManager.getSessionAttributes();
@@ -72,7 +72,7 @@ const PlayChannelIntentHandler = {
   },
   async handle(handlerInput) {
       
-    await util.checkUpdateLatestResources(handlerInput);
+    await logic.checkUpdateLatestResources(handlerInput);
     
     const {attributesManager, requestEnvelope} = handlerInput;
     const {recommendedChannels,searchedChannels,isSearchedChannels} = attributesManager.getSessionAttributes();
@@ -120,7 +120,7 @@ const PlayEpisodeIntentHandler = {
   },
   async handle(handlerInput) {
     
-    await util.checkUpdateLatestResources(handlerInput, true);
+    await logic.checkUpdateLatestResources(handlerInput, true);
     
     const {requestEnvelope} = handlerInput;
     const episodeNum = Alexa.getSlotValue(requestEnvelope, 'number');
@@ -152,7 +152,7 @@ const PlayPromotionEpisodesIntentHandler = {
   },
   async handle(handlerInput) {
       
-    await util.checkUpdateLatestResources(handlerInput);
+    await logic.checkUpdateLatestResources(handlerInput);
     
     const {attributesManager, requestEnvelope, responseBuilder} = handlerInput;
     const {lastestEposides, playbackInfo} = attributesManager.getSessionAttributes();
@@ -185,6 +185,7 @@ const SaySearchResultIntentHandler = {
             requestScope = "channels"
         }
         if (intent.confirmationStatus === 'CONFIRMED') {
+            await logic.checkUpdateLatestResources(handlerInput, true);
             let scope = Alexa.getSlotValue(requestEnvelope, 'scope');
             const keywords = Alexa.getSlotValue(requestEnvelope, 'keywords');
             if(requestScope){
@@ -333,7 +334,7 @@ const StartPlaybackHandler = {
   },
   async handle(handlerInput) {
       
-    await util.checkUpdateLatestResources(handlerInput, true);
+    await logic.checkUpdateLatestResources(handlerInput, true);
     
     return controller.play(handlerInput);
   },
@@ -606,7 +607,6 @@ const controller = {
         responseBuilder.speak(util.speakSafeText(message));
     }
     history.resume = false
-    //console.log(`${token}----${offsetInMilliseconds}`)
     responseBuilder
       .withShouldEndSession(true)
       .addAudioPlayerPlayDirective(playBehavior, podcast.audioUrl, token, offsetInMilliseconds, null, metadata);
