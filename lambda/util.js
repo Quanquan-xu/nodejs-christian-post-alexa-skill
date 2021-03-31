@@ -90,16 +90,16 @@ module.exports = {
         const isNotificationFrist = (number >= maxLength -3);
 
         if(isFromSearch){
-            message = handlerInput.t('LIST_RESULTS_NOTIFICATION_MSG_HEADER_FRO_SEARCH',{length:maxLength, name:"channels", last: notFirstTime ? " last ":" "});
+            message = this.getResponseMessage('LIST_RESULTS_NOTIFICATION_MSG_HEADER_FRO_SEARCH',{length:maxLength, name:"channels", last: notFirstTime ? " last ":" "});
         }else{
-            message = handlerInput.t('LIST_RECOMMANDED_CHANNELS_NOTIFICATION_MSG_HEADER',{length:maxLength});
+            message = this.getResponseMessage('LIST_RECOMMANDED_CHANNELS_NOTIFICATION_MSG_HEADER',{length:maxLength});
         }
 
         cardTitle = ''
         channels.forEach(function(channel, index) {
             cardTitle += 'Channel ' + (index + 1) + " : " + channel.title + ";  "
         });
-        cardSubtitle = handlerInput.t('LIST_PROMPT_NOTIFICATION_MSG',{name:"channel", number:number});
+        cardSubtitle = this.getResponseMessage('LIST_PROMPT_NOTIFICATION_MSG',{name:"channel", number:number});
 
         if(isNotificationFrist){
             message += cardSubtitle;
@@ -122,26 +122,26 @@ module.exports = {
 
         message = '';
         cardTitle = ''
-        cardSubtitle = handlerInput.t('LIST_PROMPT_NOTIFICATION_MSG',{name:"episode", number:number});
+        cardSubtitle = this.getResponseMessage('LIST_PROMPT_NOTIFICATION_MSG',{name:"episode", number:number});
 
         if(playlist['type'] === 'channel'){
-            message = handlerInput.t('LIST_PLAYLIST_NOTIFICATION_MSG_HEADER_FRO_CHANNEL', {length:maxLength, name:playlist['name']})
+            message = this.getResponseMessage('LIST_PLAYLIST_NOTIFICATION_MSG_HEADER_FRO_CHANNEL', {length:maxLength, name:playlist['name']})
             Object.values(episodes).forEach(function(episode, index) {
                 cardTitle += 'Episode ' + (index + 1) + " : " + episode.title + ";  "
             });
         }else{
             if(playlist['name'].includes("featured")){
-                message = handlerInput.t('LIST_PLAYLIST_NOTIFICATION_MSG_HEADER_FRO_PROMOTION', {length:maxLength})
+                message = this.getResponseMessage('LIST_PLAYLIST_NOTIFICATION_MSG_HEADER_FRO_PROMOTION', {length:maxLength})
                 Object.values(episodes).forEach(function(episode, index) {
                     cardTitle += 'Episode ' + (index + 1) + " : " + episode.title + ";  "
                 });
             }else if (playlist['name'].includes("search")) {
-                message = handlerInput.t('LIST_RESULTS_NOTIFICATION_MSG_HEADER_FRO_SEARCH',{length:maxLength, name:"episodes"});
+                message = this.getResponseMessage('LIST_RESULTS_NOTIFICATION_MSG_HEADER_FRO_SEARCH',{length:maxLength, name:"episodes"});
                 Object.values(episodes).forEach(function(episode, index) {
                     cardTitle += 'Episode ' + (index + 1) + " : " + episode.title + " from channel " + episode.channelName +";  "
                 });
             }else{
-                message = handlerInput.t('LIST_PLAYLIST_NOTIFICATION_MSG_HEADER_FRO_EPISODES', {length:maxLength})
+                message = this.getResponseMessage('LIST_PLAYLIST_NOTIFICATION_MSG_HEADER_FRO_EPISODES', {length:maxLength})
                 Object.values(episodes).forEach(function(episode, index) {
                     cardTitle += 'Episode ' + (index + 1) + " : " + episode.title + ";  "
                 });
@@ -152,7 +152,7 @@ module.exports = {
             message += cardSubtitle;
         }
         if(maxLength > 5){
-            message += handlerInput.t('LIST_ONLY_TOP_FIVE_NOTIFICATION_MSG',{name:""});
+            message += this.getResponseMessage('LIST_ONLY_TOP_FIVE_NOTIFICATION_MSG',{name:""});
         }
         if(playlist['type'] === 'episode' && playlist['name'].includes("search")){
             Object.values(episodes).filter( (ele,index) => index < 5 ).forEach(function(episode, index) {
@@ -181,18 +181,18 @@ module.exports = {
         Object.values(episodes).forEach(function(episode, index) {
           cardTitle += 'Episode ' + (index + 1) + " : " + episode.title + ";  "
         });
-        cardSubtitle = handlerInput.t('LIST_PROMPT_NOTIFICATION_MSG',{name:"episode", number:number});
+        cardSubtitle = this.getResponseMessage('LIST_PROMPT_NOTIFICATION_MSG',{name:"episode", number:number});
 
         if(playlist['type'] === 'channel'){
-          message = handlerInput.t('LIST_PROMOTION_EPISODES_NOTIFICATION_MSG_FOR_CHANNEL')
+          message = this.getResponseMessage('LIST_PROMOTION_EPISODES_NOTIFICATION_MSG_FOR_CHANNEL')
         }else{
-          message = handlerInput.t('LIST_PROMOTION_EPISODES_NOTIFICATION_MSG_FOR_EPISODES')
+          message = this.getResponseMessage('LIST_PROMOTION_EPISODES_NOTIFICATION_MSG_FOR_EPISODES')
           if(isNotificationFrist){
               message += cardSubtitle;
           }
         }
         if(maxLength > 5){
-            message += handlerInput.t('LIST_ONLY_TOP_FIVE_NOTIFICATION_MSG',{name:"latest featured episodes"});
+            message += this.getResponseMessage('LIST_ONLY_TOP_FIVE_NOTIFICATION_MSG',{name:"latest featured episodes"});
         }
         Object.values(episodes).filter( (ele,index) => index < 5 ).forEach(function(episode, index) {
           message += 'Episode ' + (index + 1) + " : " + episode.title + ";  "
