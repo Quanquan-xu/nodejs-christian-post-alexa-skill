@@ -44,7 +44,6 @@ exports.handler = skillBuilder
   .addErrorHandlers(normalHandlers.ErrorHandler)
   .addRequestInterceptors(
     interceptors.LoadAttributesRequestInterceptor,
-    interceptors.LocalisationRequestInterceptor,
     interceptors.LoggingRequestInterceptor
   )
   .addResponseInterceptors(

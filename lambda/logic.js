@@ -70,6 +70,7 @@ module.exports = {
     fetchSearchResults(keywords,scope,handlerInput){
         const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
         const url = endpoint + `/search?api_version=1&k=${keywords}&order_by=relevancy`;
+
         var config = {
             timeout: 6500, // timeout api call before we reach Alexa's 8 sec timeout, or set globally via axios.defaults.timeout
             headers: {'Accept': 'application/json;charset=UTF-8'}
@@ -88,6 +89,7 @@ module.exports = {
                     last_published_at:channel['last_published_at'],
                     description:channel['short_description']
                 }));
+
                 sessionAttributes['searchedChannels'] = searchedChannels;
                 sessionAttributes['isSearchedChannels'] = true;
                 return util.getSayChannelsMessages(searchedChannels,handlerInput,true,false);

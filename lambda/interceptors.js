@@ -1,7 +1,4 @@
 const Alexa = require('ask-sdk-core');
-// i18n dependency
-const i18n = require('i18next');
-const languageStrings = require('./localisation');
 const constants = require('./constants');
 const logic = require('./logic');
 
@@ -18,30 +15,6 @@ const LoggingResponseInterceptor = {
         console.log(`Outgoing response: ${JSON.stringify(response)}`);
     }
 };
-
-// This request interceptor will bind a translation function 't' to the handlerInput
-// Additionally it will handle picking a random value if instead of a string it receives an array
-const LocalisationRequestInterceptor = {
-    process(handlerInput) {
-        const localisationClient = i18n.init({
-            lng: Alexa.getLocale(handlerInput.requestEnvelope),
-            resources: languageStrings,
-            returnObjects: true
-        });
-        localisationClient.localise = function localise() {
-            const args = arguments;
-            const value = i18n.t(...args);
-            if (Array.isArray(value)) {
-                return value[Math.floor(Math.random() * value.length)];
-            }
-            return value;
-        };
-        handlerInput.t = function translate(...args) {
-            return localisationClient.localise(...args);
-        }
-    }
-};
-
 
 const LoadAttributesRequestInterceptor = {
     async process(handlerInput) {
@@ -124,7 +97,6 @@ const SaveAttributesResponseInterceptor = {
 module.exports = {
     LoggingRequestInterceptor,
     LoggingResponseInterceptor,
-    LocalisationRequestInterceptor,
     LoadAttributesRequestInterceptor,
     SaveAttributesResponseInterceptor
 }
