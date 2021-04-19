@@ -1,7 +1,7 @@
 {
   "interactionModel": {
     "languageModel": {
-      "invocationName": "edifi podcasts",
+      "invocationName": "christian podcast",
       "intents": [
         {
           "name": "AMAZON.CancelIntent",
@@ -763,5 +763,5 @@
       }
     ]
   },
-  "version": "1"
+  "version": "2"
 }
