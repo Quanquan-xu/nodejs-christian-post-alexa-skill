@@ -267,6 +267,7 @@ const AudioPlayerEventHandler = {
         playbackInfo.token = token;
         playbackInfo.index = index;
         playbackInfo.offsetInMilliseconds = offsetInMilliseconds;
+        playbackInfo.inPlaybackSession = false;
         Object.assign(history["episodes"], {[token]:offsetInMilliseconds})
         break;
       case 'PlaybackNearlyFinished':
@@ -306,6 +307,7 @@ const AudioPlayerEventHandler = {
         }
       case 'PlaybackFailed':
         playbackInfo.inPlaybackSession = false;
+        playbackInfo.hasPreviousPlaybackSession = false;
         Object.assign(history["episodes"], {[token]:offsetInMilliseconds})
         console.log('Playback Failed : %j', handlerInput.requestEnvelope.request.error);
         return;
@@ -320,7 +322,7 @@ const StartPlaybackHandler = {
   async canHandle(handlerInput) {
     const {playbackInfo} = handlerInput.attributesManager.getSessionAttributes();
     if (!playbackInfo.inPlaybackSession) {
-      return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' && Alexa.getIntentName(handlerInput.requestEnvelope) === 'PlayPodcast';
+      return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' && (Alexa.getIntentName(handlerInput.requestEnvelope) === 'PlayPodcast' || Alexa.getIntentName(handlerInput.requestEnvelope) ==='AMAZON.ResumeIntent');
     }
 
     if (Alexa.getRequestType(handlerInput.requestEnvelope) === 'PlaybackController.PlayCommandIssued') {
@@ -586,8 +588,10 @@ const controller = {
     const token = playlistTokens[index];
     const podcast = playlist['episodes'][token];
     playbackInfo.token = token;
+    
+    const isPause = (!playbackInfo.inPlaybackSession && playbackInfo.hasPreviousPlaybackSession)
 
-    if(history['episodes'][token] && history['episodes'][token] > 60000){
+    if(!isPause && history['episodes'][token] && history['episodes'][token] > 60000){
         history.resume = true;
         playbackInfo.offsetInMilliseconds = parseInt(history['episodes'][token]) - 5000;
         return util.getResumeMessageResponse(podcast,playlist, parseInt(history['episodes'][token]), handlerInput)
@@ -603,7 +607,7 @@ const controller = {
         constants.IMAGES.standardCardSmallImageUrl,
         constants.IMAGES.standardCardLargeImageUrl
     );
-    if(!history.resume){
+    if(!isPause && !history.resume){
         responseBuilder.speak(util.speakSafeText(message));
     }
     history.resume = false
