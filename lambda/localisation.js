@@ -22,6 +22,7 @@ module.exports = {
             START_PLAYING_RESUME_MSG: `Last time, You have heard {{description}} around {{time}}. Would you like to resume? `,
             START_PLAYING_RESUME_MSG_REPROMPT: 'You can say yes to resume or no to play from the beigining.',
             START_PLAYING_HELP_MSG: `You can say, Next or Previous to navigate through your playlist. You can also say Alexa, ask Christian Podcast see my playlist, to look through the playlist! Or say, Alexa, ask Christian Podcast play channel + number, to change channel!`,
+            START_PLAYING_HELP_MSG_IN_SHORT: `You can say, Next or Previous to navigate through your playlist.`,
             LIST_PROMPT_NOTIFICATION_MSG: `You can use number, instead of name by saying, for example, alexa, {{name}} {{number}}, to start podcasts! `,
             LIST_ONLY_TOP_FIVE_NOTIFICATION_MSG: ` Here are top 5 {{name}} : `,
             LIST_PROMOTION_EPISODES_NOTIFICATION_MSG_FOR_CHANNEL: `{{length}} latest featured episodes are available, you can say alexa, play featured episodes, to change your playlist! `,

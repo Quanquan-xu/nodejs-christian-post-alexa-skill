@@ -184,9 +184,9 @@ module.exports = {
         cardSubtitle = this.getResponseMessage('LIST_PROMPT_NOTIFICATION_MSG',{name:"episode", number:number});
 
         if(playlist['type'] === 'channel'){
-          message = this.getResponseMessage('LIST_PROMOTION_EPISODES_NOTIFICATION_MSG_FOR_CHANNEL')
+          message = this.getResponseMessage('LIST_PROMOTION_EPISODES_NOTIFICATION_MSG_FOR_CHANNEL',{length:maxLength})
         }else{
-          message = this.getResponseMessage('LIST_PROMOTION_EPISODES_NOTIFICATION_MSG_FOR_EPISODES')
+          message = this.getResponseMessage('LIST_PROMOTION_EPISODES_NOTIFICATION_MSG_FOR_EPISODES',{length:maxLength})
           if(isNotificationFrist){
               message += cardSubtitle;
           }
@@ -232,7 +232,7 @@ module.exports = {
         const {description,subtitle} = this.getDescriptionSubtitleMessage(podcast, playlist);
         let message = this.getResponseMessage('START_PLAYING_MSG', {description: description});
         if(index % 5 === 0 && (!sessionCounter || sessionCounter <= 40 || sessionCounter % 7 === 0)){
-            message = message + this.getResponseMessage('START_PLAYING_HELP_MSG')
+            message = message + this.getResponseMessage('START_PLAYING_HELP_MSG_IN_SHORT')
         }
         const backgroundImage = constants.IMAGES["backgroundImage"]
         const metadata = {
@@ -292,11 +292,9 @@ module.exports = {
         return this.formatResponseBuilder(message, reprompt, message, reprompt, handlerInput);
     },
     formatResponseBuilder(cardTitle,cardSubtitle, message, reprompt, handlerInput){
-        handlerInput.responseBuilder.withStandardCard(
-            this.speakSafeText(cardTitle),
-            cardSubtitle,
-            constants.IMAGES.standardCardSmallImageUrl,
-            constants.IMAGES.standardCardLargeImageUrl
+        handlerInput.responseBuilder.withSimpleCard(
+            cardTitle,
+            cardSubtitle
         );
         return handlerInput.responseBuilder
             .speak(this.speakSafeText(message))

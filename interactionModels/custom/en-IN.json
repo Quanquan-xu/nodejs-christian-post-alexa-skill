@@ -667,7 +667,7 @@
         "variations": [
           {
             "type": "PlainText",
-            "value": "Ok, got it ！Search for{scope} about {keywords} , right?"
+            "value": "Ok, got it ！Search for {scope} about {keywords} , right?"
           }
         ]
       },
