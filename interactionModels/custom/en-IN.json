@@ -19,6 +19,7 @@
           "name": "PlayPodcast",
           "slots": [],
           "samples": [
+            "play podcast",
             "begin",
             "start",
             "begin podcast",
@@ -97,9 +98,16 @@
           ]
         },
         {
-          "name": "PlayPromotionEpisodes",
+          "name": "PlayFeaturedEpisodes",
           "slots": [],
           "samples": [
+            "play the latest episodes",
+            "start the latest episode",
+            "start latest episode",
+            "start the latest episodes",
+            "start latest episodes",
+            "start feature episodes",
+            "start featured episodes ",
             "play features episode",
             "play features episodes",
             "features episode",
@@ -108,12 +116,12 @@
             "play feature episode",
             "play featured episode",
             "play featured episodes",
-            "play lastest episode",
-            "play lastest episodes",
+            "play latest episode",
+            "play latest episodes",
             "featured episode",
             "featured episodes",
-            "lastest episodes",
-            "lastest episode"
+            "latest episodes",
+            "latest episode"
           ]
         },
         {
@@ -195,42 +203,7 @@
           "samples": []
         },
         {
-          "name": "SaySearchResult",
-          "slots": [
-            {
-              "name": "keywords",
-              "type": "AMAZON.SearchQuery",
-              "samples": [
-                "search about {keywords}",
-                "{keywords}",
-                "about {keywords}"
-              ]
-            },
-            {
-              "name": "scope",
-              "type": "scope",
-              "samples": [
-                "search for {scope}",
-                "search {scope}",
-                "{scope}"
-              ]
-            }
-          ],
-          "samples": [
-            "search for {scope}",
-            "search podcast about {keywords}",
-            "search podcasts about {keywords}",
-            "search {keywords} podcast",
-            "search {keywords} podcasts",
-            "search podcasts",
-            "search podcast",
-            "search",
-            "search {scope}",
-            "search about {keywords}"
-          ]
-        },
-        {
-          "name": "SayEpisodesSearchResult",
+          "name": "SearchEpisodes",
           "slots": [
             {
               "name": "keywords",
@@ -242,18 +215,16 @@
             }
           ],
           "samples": [
+            "search",
+            "search {keywords}",
             "search for episodes about {keywords}",
             "search for episode about {keywords}",
-            "search {keywords} episode",
-            "search {keywords} episodes",
-            "search episode {keywords}",
-            "search episodes {keywords}",
             "search episodes about {keywords}",
             "search episode about {keywords}"
           ]
         },
         {
-          "name": "SayChannelsSearchResult",
+          "name": "SearchChannels",
           "slots": [
             {
               "name": "keywords",
@@ -265,10 +236,10 @@
             }
           ],
           "samples": [
+            "search channel",
+            "search channels",
             "search for channel about {keywords}",
             "search for channels about {keywords}",
-            "search {keywords} channels",
-            "search {keywords} channel",
             "search channel about {keywords}",
             "search channels about {keywords}",
             "search channels {keywords}",
@@ -288,6 +259,19 @@
             "recommended channel",
             "recommended channels",
             "list recommended channels"
+          ]
+        },
+        {
+          "name": "PlaySearchChannels",
+          "slots": [
+            {
+              "name": "keywords",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "play {keywords} podcast",
+            "play {keywords}"
           ]
         }
       ],
@@ -470,57 +454,9 @@
           ]
         },
         {
-          "name": "SaySearchResult",
-          "confirmationRequired": true,
-          "prompts": {
-            "confirmation": "Confirm.Intent.1049476184652"
-          },
-          "slots": [
-            {
-              "name": "keywords",
-              "type": "AMAZON.SearchQuery",
-              "elicitationRequired": true,
-              "confirmationRequired": false,
-              "prompts": {
-                "elicitation": "Elicit.Slot.1049476184652.531579695171"
-              },
-              "validations": [
-                {
-                  "type": "isNotInSet",
-                  "prompt": "Slot.Validation.1165527005878.1125610626537.616475178014",
-                  "values": [
-                    "channels",
-                    "about",
-                    "channel",
-                    "episode",
-                    "episodes"
-                  ]
-                }
-              ]
-            },
-            {
-              "name": "scope",
-              "type": "scope",
-              "elicitationRequired": true,
-              "confirmationRequired": false,
-              "prompts": {
-                "elicitation": "Elicit.Slot.1049476184652.868755712142"
-              },
-              "validations": [
-                {
-                  "type": "hasEntityResolutionMatch",
-                  "prompt": "Slot.Validation.1049476184652.868755712142.353377519352"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "SayEpisodesSearchResult",
-          "confirmationRequired": true,
-          "prompts": {
-            "confirmation": "Confirm.Intent.219627282813"
-          },
+          "name": "SearchEpisodes",
+          "confirmationRequired": false,
+          "prompts": {},
           "slots": [
             {
               "name": "keywords",
@@ -547,11 +483,9 @@
           ]
         },
         {
-          "name": "SayChannelsSearchResult",
-          "confirmationRequired": true,
-          "prompts": {
-            "confirmation": "Confirm.Intent.169261981478"
-          },
+          "name": "SearchChannels",
+          "confirmationRequired": false,
+          "prompts": {},
           "slots": [
             {
               "name": "keywords",
@@ -663,29 +597,11 @@
         ]
       },
       {
-        "id": "Confirm.Intent.1049476184652",
-        "variations": [
-          {
-            "type": "PlainText",
-            "value": "Ok, got it ！Search for {scope} about {keywords} , right?"
-          }
-        ]
-      },
-      {
         "id": "Elicit.Slot.1049476184652.531579695171",
         "variations": [
           {
             "type": "PlainText",
             "value": "Which topic do you want to search,  you can say keywords, Bible verse or one sentence."
-          }
-        ]
-      },
-      {
-        "id": "Elicit.Slot.1049476184652.868755712142",
-        "variations": [
-          {
-            "type": "PlainText",
-            "value": " What kind of search result do you want to return, channels or episodes ?"
           }
         ]
       },
@@ -699,15 +615,6 @@
         ]
       },
       {
-        "id": "Confirm.Intent.219627282813",
-        "variations": [
-          {
-            "type": "PlainText",
-            "value": "Ok, got it ！Search for episodes about {keywords} , right?"
-          }
-        ]
-      },
-      {
         "id": "Elicit.Slot.219627282813.1008872933746",
         "variations": [
           {
@@ -717,20 +624,11 @@
         ]
       },
       {
-        "id": "Confirm.Intent.169261981478",
-        "variations": [
-          {
-            "type": "PlainText",
-            "value": "Ok, got it ！Search for channels about {keywords} , right?"
-          }
-        ]
-      },
-      {
         "id": "Elicit.Slot.169261981478.728754322583",
         "variations": [
           {
             "type": "PlainText",
-            "value": "Which topic do you want to search,  you can say keywords, Bible verse or one sentence."
+            "value": "Which ministry or preacher name do you want to search ?"
           }
         ]
       },
@@ -760,8 +658,17 @@
             "value": "Which topic do you want to search,  you can say Bible verse or one sentence ."
           }
         ]
+      },
+      {
+        "id": "Elicit.Slot.911410090400.1391698965350",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Which topic do you want to search,  you can say keywords, Bible verse or one sentence."
+          }
+        ]
       }
     ]
   },
-  "version": "2"
+  "version": "5"
 }

@@ -3,7 +3,7 @@
  * By The Christian Post.
  * The earth shall be full of the knowledge of the Lord as the waters cover the sea! Isaiah 11:9
  * */
- 
+
 const Alexa = require('ask-sdk-core');
 const util = require('./util'); // utility functions
 const interceptors = require('./interceptors');
@@ -20,10 +20,10 @@ exports.handler = skillBuilder
     audioPlayerHandlers.HelpHandler,
     audioPlayerHandlers.SayListIntentHandler,
     audioPlayerHandlers.SayRecommendedChannelsHandler,
-    audioPlayerHandlers.SaySearchResultIntentHandler,
+    audioPlayerHandlers.SearchIntentHandler,
     audioPlayerHandlers.PlayChannelIntentHandler,
     audioPlayerHandlers.PlayEpisodeIntentHandler,
-    audioPlayerHandlers.PlayPromotionEpisodesIntentHandler,
+    audioPlayerHandlers.PlayFeaturedEpisodesIntentHandler,
     audioPlayerHandlers.YesHandler,
     audioPlayerHandlers.NoHandler,
     audioPlayerHandlers.StartPlaybackHandler,
@@ -54,8 +54,8 @@ exports.handler = skillBuilder
   .withApiClient(new Alexa.DefaultApiClient())
   .withCustomUserAgent('sample/hello-world/v1.2')
   .lambda();
-  
-  
+
+
   /* *
  * STANDARD FOOTER:
  * The earth shall be full of the knowledge of the Lord as the waters cover the sea! Isaiah 11:9

@@ -16,7 +16,7 @@ const LaunchRequestHandler = {
     const {playbackInfo,playlistTokens,playlist,history,sessionCounter} = handlerInput.attributesManager.getSessionAttributes();
     let message;
     let reprompt;
-
+    history.targetChannel = 0
     if (!playbackInfo.hasPreviousPlaybackSession || playbackInfo.index < 0) {
         if(playbackInfo.index < 0){
             playbackInfo.index = 0;
