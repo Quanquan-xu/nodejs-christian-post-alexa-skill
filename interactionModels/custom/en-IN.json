@@ -215,8 +215,22 @@
             }
           ],
           "samples": [
+            "search about",
+            "search for",
+            "search for podcasts",
+            "search for podcast",
+            "search for episodes",
+            "search for episode",
+            "search podcasts",
+            "search podcast ",
+            "search episodes ",
+            "search episode",
             "search",
             "search {keywords}",
+            "search for podcasts about {keywords}",
+            "search for podcast about {keywords}",
+            "search podcasts about {keywords}",
+            "search podcast about {keywords}",
             "search for episodes about {keywords}",
             "search for episode about {keywords}",
             "search episodes about {keywords}",
@@ -628,7 +642,7 @@
         "variations": [
           {
             "type": "PlainText",
-            "value": "Which ministry or preacher name do you want to search ?"
+            "value": "Which ministry or pastor\u0027s channel do you want to search ?"
           }
         ]
       },
@@ -670,5 +684,5 @@
       }
     ]
   },
-  "version": "5"
+  "version": "25"
 }
