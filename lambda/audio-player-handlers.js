@@ -11,9 +11,9 @@ const SayListIntentHandler = {
     return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' && Alexa.getIntentName(handlerInput.requestEnvelope) === 'SayList';
   },
   async handle(handlerInput) {
-      
+
     await logic.checkUpdateLatestResources(handlerInput);
-    
+
     const {attributesManager, requestEnvelope} = handlerInput;
     const sessionAttributes = attributesManager.getSessionAttributes();
     const queryName = Alexa.getSlotValue(requestEnvelope, 'queryName');
@@ -52,16 +52,16 @@ const SayRecommendedChannelsHandler = {
     return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' && Alexa.getIntentName(handlerInput.requestEnvelope) === 'SayRecommendedChannels';
   },
   async handle(handlerInput) {
-      
+
     await logic.checkUpdateLatestResources(handlerInput);
-    
+
     const {attributesManager, requestEnvelope} = handlerInput;
     const sessionAttributes = attributesManager.getSessionAttributes();
     const channels = sessionAttributes['recommendedChannels'];
     sessionAttributes['isSearchedChannels'] = false
     let messages = {};
     messages = util.getSayChannelsMessages(channels,handlerInput);
-    
+
     const reprompt = util.getResponseMessage('REPROMPT_MSG');
     return util.formatResponseBuilder(messages.cardTitle, messages.cardSubtitle, messages.message, reprompt, handlerInput);
     }
@@ -71,15 +71,18 @@ const PlayChannelIntentHandler = {
     return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' && Alexa.getIntentName(handlerInput.requestEnvelope) === 'PlayChannel';
   },
   async handle(handlerInput) {
-      
+
     await logic.checkUpdateLatestResources(handlerInput);
-    
+
     const {attributesManager, requestEnvelope} = handlerInput;
-    const {recommendedChannels,searchedChannels,isSearchedChannels} = attributesManager.getSessionAttributes();
-    const channelNum = Alexa.getSlotValue(requestEnvelope, 'number');
+    const {recommendedChannels,searchedChannels,isSearchedChannels,history} = attributesManager.getSessionAttributes();
+    let channelNum = Alexa.getSlotValue(requestEnvelope, 'number');
     let availableChannels = recommendedChannels;
     if(isSearchedChannels){
         availableChannels = searchedChannels;
+        if(!channelNum){
+          channelNum = history.targetChannel;
+        }
     }
     if(channelNum){
         const index = parseInt(channelNum) - 1;
@@ -119,9 +122,9 @@ const PlayEpisodeIntentHandler = {
     return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' && Alexa.getIntentName(handlerInput.requestEnvelope) === 'PlayEpisode';
   },
   async handle(handlerInput) {
-    
+
     await logic.checkUpdateLatestResources(handlerInput, true);
-    
+
     const {requestEnvelope} = handlerInput;
     const episodeNum = Alexa.getSlotValue(requestEnvelope, 'number');
 
@@ -146,14 +149,14 @@ const PlayEpisodeIntentHandler = {
     }
 };
 
-const PlayPromotionEpisodesIntentHandler = {
+const PlayFeaturedEpisodesIntentHandler = {
   canHandle(handlerInput) {
-    return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' && Alexa.getIntentName(handlerInput.requestEnvelope) === 'PlayPromotionEpisodes';
+    return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' && Alexa.getIntentName(handlerInput.requestEnvelope) === 'PlayFeaturedEpisodes';
   },
   async handle(handlerInput) {
-      
+
     await logic.checkUpdateLatestResources(handlerInput);
-    
+
     const {attributesManager, requestEnvelope, responseBuilder} = handlerInput;
     const {lastestEposides, playbackInfo} = attributesManager.getSessionAttributes();
     const sessionAttributes = attributesManager.getSessionAttributes();
@@ -166,48 +169,68 @@ const PlayPromotionEpisodesIntentHandler = {
   }
 };
 
-const SaySearchResultIntentHandler = {
+const SearchIntentHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
-            && (Alexa.getIntentName(handlerInput.requestEnvelope) === 'SaySearchResult'||
-        Alexa.getIntentName(handlerInput.requestEnvelope) === 'SayEpisodesSearchResult' ||
-        Alexa.getIntentName(handlerInput.requestEnvelope) === 'SayChannelsSearchResult');
+            && (Alexa.getIntentName(handlerInput.requestEnvelope) === 'PlaySearchChannels'||
+        Alexa.getIntentName(handlerInput.requestEnvelope) === 'SearchEpisodes' ||
+        Alexa.getIntentName(handlerInput.requestEnvelope) === 'SearchChannels');
     },
     async handle(handlerInput) {
         const {attributesManager, requestEnvelope} = handlerInput;
         const sessionAttributes = attributesManager.getSessionAttributes();
         const {intent} = requestEnvelope.request;
-        let requestScope = "";
-        if(Alexa.getIntentName(handlerInput.requestEnvelope) ==='SayEpisodesSearchResult' ){
-            requestScope = "episodes"
+        let scope;
+        let isSearchForPlaying = false
+        if(Alexa.getIntentName(handlerInput.requestEnvelope) ==='PlaySearchChannels' ){
+            scope = "channels"
+            isSearchForPlaying = true
+        }else if (Alexa.getIntentName(handlerInput.requestEnvelope) ==='SearchChannels') {
+            scope = "channels"
+        }else{
+            scope = "episodes"
         }
-        if(Alexa.getIntentName(handlerInput.requestEnvelope) ==='SayChannelsSearchResult' ){
-            requestScope = "channels"
-        }
-        if (intent.confirmationStatus === 'CONFIRMED') {
-            await logic.checkUpdateLatestResources(handlerInput, true);
-            let scope = Alexa.getSlotValue(requestEnvelope, 'scope');
-            const keywords = Alexa.getSlotValue(requestEnvelope, 'keywords');
-            if(requestScope){
-                scope = requestScope;
-            }
-            try {
-                const description = `search ${scope} about ${keywords} ...`;
-                await util.callDirectiveService(handlerInput, util.getResponseMessage('PROGRESSIVE_MSG', {description: description}));
-            } catch (error) {
-                console.log("Progressive response directive error : " + error);
-            }
 
-            const {message, cardTitle, cardSubtitle} = await logic.fetchSearchResults(keywords,scope,handlerInput);
-            const reprompt = util.getResponseMessage('REPROMPT_MSG');
-            return util.formatResponseBuilder(cardTitle, cardSubtitle, message, reprompt, handlerInput);
+        await logic.checkUpdateLatestResources(handlerInput, true);
+        const keywords = Alexa.getSlotValue(requestEnvelope, 'keywords');
+        try {
+            let message;
+            if(isSearchForPlaying){
+              message = util.getResponseMessage('PLAY_SEARCH_CHANNEL_PROGRESSIVE_MSG', {keywords: keywords});
+            }else{
+              const description = `search ${scope} about ${keywords} ...`;
+              message = util.getResponseMessage('PROGRESSIVE_MSG', {description: description});
+            }
+            await util.callDirectiveService(handlerInput, message);
+        } catch (error) {
+            console.log("Progressive response directive error : " + error);
         }
-        const message = util.getResponseMessage('SEARCH_CONFIRMATION_REJECTED_MSG', {name: requestScope ? requestScope : "channels or episodes"});
-        const reprompt = util.getResponseMessage('REPROMPT_MSG');
-        return util.formatResponseBuilder(message, reprompt, message, reprompt, handlerInput);
+        const results = await logic.fetchSearchResults(keywords,scope,handlerInput);
+        if(results){
+            if(scope === "channels"){
+              const searchedChannels = results;
+              const firstChannelTitle = searchedChannels[0]["title"];
+              const p = util.similarity(firstChannelTitle, keywords);
+              if(p >= 0.85){
+                return await PlayChannelIntentHandler.handle(handlerInput);
+              }else{
+                return util.getSearchConfirmationMessage(handlerInput, true)
+              }
+            }else{
+              const { playbackInfo } = attributesManager.getSessionAttributes();
+              playbackInfo.index = 0;
+              playbackInfo.offsetInMilliseconds = 0;
+              playbackInfo.playbackIndexChanged = true;
+              playbackInfo.hasPreviousPlaybackSession = false;
+              return controller.play(handlerInput);
+            }
+        }else{
+          const message = util.getResponseMessage('API_ERROR_MSG');
+          const reprompt = util.getResponseMessage('REPROMPT_MSG');
+          return util.formatResponseBuilder(message, reprompt, message, reprompt, handlerInput);
+        }
     }
 };
-
 // baisc audio player handlers
 
 const CheckAudioInterfaceHandler = {
@@ -267,7 +290,7 @@ const AudioPlayerEventHandler = {
         playbackInfo.token = token;
         playbackInfo.index = index;
         playbackInfo.offsetInMilliseconds = offsetInMilliseconds;
-        playbackInfo.inPlaybackSession = false;
+         playbackInfo.inPlaybackSession = false;
         Object.assign(history["episodes"], {[token]:offsetInMilliseconds})
         break;
       case 'PlaybackNearlyFinished':
@@ -307,7 +330,6 @@ const AudioPlayerEventHandler = {
         }
       case 'PlaybackFailed':
         playbackInfo.inPlaybackSession = false;
-        playbackInfo.hasPreviousPlaybackSession = false;
         Object.assign(history["episodes"], {[token]:offsetInMilliseconds})
         console.log('Playback Failed : %j', handlerInput.requestEnvelope.request.error);
         return;
@@ -322,7 +344,7 @@ const StartPlaybackHandler = {
   async canHandle(handlerInput) {
     const {playbackInfo} = handlerInput.attributesManager.getSessionAttributes();
     if (!playbackInfo.inPlaybackSession) {
-      return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' && (Alexa.getIntentName(handlerInput.requestEnvelope) === 'PlayPodcast' || Alexa.getIntentName(handlerInput.requestEnvelope) ==='AMAZON.ResumeIntent');
+      return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' && Alexa.getIntentName(handlerInput.requestEnvelope) === 'PlayPodcast';
     }
 
     if (Alexa.getRequestType(handlerInput.requestEnvelope) === 'PlaybackController.PlayCommandIssued') {
@@ -335,9 +357,9 @@ const StartPlaybackHandler = {
     }
   },
   async handle(handlerInput) {
-      
+
     await logic.checkUpdateLatestResources(handlerInput, true);
-    
+
     return controller.play(handlerInput);
   },
 };
@@ -483,10 +505,13 @@ const StartOverHandler = {
 const YesHandler = {
   async canHandle(handlerInput) {
     const {playbackInfo,history} = handlerInput.attributesManager.getSessionAttributes();
-    return (!playbackInfo.inPlaybackSession || history.resume) && Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.YesIntent';
+    return (!playbackInfo.inPlaybackSession || history.resume || history.targetChannel) && Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.YesIntent';
   },
-  handle(handlerInput) {
+  async handle(handlerInput) {
     const {playbackInfo, history} = handlerInput.attributesManager.getSessionAttributes();
+    if(history.targetChannel){
+        return await PlayChannelIntentHandler.handle(handlerInput);
+    }
     util.removeResumeHistoryEpisode(playbackInfo, history)
     return controller.play(handlerInput);
   },
@@ -495,10 +520,19 @@ const YesHandler = {
 const NoHandler = {
   async canHandle(handlerInput) {
     const {playbackInfo, history} = handlerInput.attributesManager.getSessionAttributes();
-    return (!playbackInfo.inPlaybackSession || history.resume) && Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.NoIntent';
+    return (!playbackInfo.inPlaybackSession || history.resume || history.targetChannel) && Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.NoIntent';
   },
   async handle(handlerInput) {
     const {playbackInfo, history} = handlerInput.attributesManager.getSessionAttributes();
+    if(history.targetChannel){
+      if(history.targetChannel <= 3){
+        return util.getSearchConfirmationMessage(handlerInput)
+      }else{
+        await logic.updateLatestResources(handlerInput, util.getResponseMessage('CHANNEL_SEARCH_RESULTS_CONFIRMATION_END_MSG'));
+        history.targetChannel = 0;
+        return await PlayFeaturedEpisodesIntentHandler.handle(handlerInput)
+      }
+    }
     if(!history.resume){
         playbackInfo.inPlaybackSession = true
         return util.getStartResumeNoResponse(handlerInput)
@@ -538,7 +572,7 @@ const HelpHandler = {
       message += util.getResponseMessage('HELP_IN_QUESTION_MSG',{number1:(Math.floor(Math.random() * 10) + 1), number2: (Math.floor(Math.random() * 10) + 1)});
       message += util.getResponseMessage('HELP_IN_SEARCH_MSG');
     }
-    
+
     return util.formatResponseBuilder(message, "", message, message, handlerInput);
   },
 };
@@ -570,14 +604,14 @@ const controller = {
       attributesManager,
       responseBuilder
     } = handlerInput;
-
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     const {
       playbackInfo,
       playlist,
       playlistTokens,
       history,
       sessionCounter
-    } = handlerInput.attributesManager.getSessionAttributes();
+    } = sessionAttributes;
 
     const {
       offsetInMilliseconds,
@@ -588,11 +622,12 @@ const controller = {
     const token = playlistTokens[index];
     const podcast = playlist['episodes'][token];
     playbackInfo.token = token;
-    
-    const isPause = (!playbackInfo.inPlaybackSession && playbackInfo.hasPreviousPlaybackSession)
+
+    const isPause = (!playbackInfo.inPlaybackSession && playbackInfo.hasPreviousPlaybackSession);
 
     if(!isPause && history['episodes'][token] && history['episodes'][token] > 60000){
         history.resume = true;
+        history.targetChannel = 0;
         playbackInfo.offsetInMilliseconds = parseInt(history['episodes'][token]) - 5000;
         return util.getResumeMessageResponse(podcast,playlist, parseInt(history['episodes'][token]), handlerInput)
     }
@@ -601,16 +636,17 @@ const controller = {
 
     const {message, metadata, cardTitle, cardSubtitle} = util.getResponseMetadata(podcast,playlist,index,sessionCounter)
 
-    responseBuilder.withStandardCard(
+    responseBuilder.withSimpleCard(
         cardTitle,
-        cardSubtitle,
-        constants.IMAGES.standardCardSmallImageUrl,
-        constants.IMAGES.standardCardLargeImageUrl
+        cardSubtitle
     );
     if(!isPause && !history.resume){
         responseBuilder.speak(util.speakSafeText(message));
     }
-    history.resume = false
+
+    history.resume = false;
+    history.targetChannel = 0;
+
     responseBuilder
       .withShouldEndSession(true)
       .addAudioPlayerPlayDirective(playBehavior, podcast.audioUrl, token, offsetInMilliseconds, null, metadata);
@@ -698,10 +734,10 @@ module.exports = {
     NoHandler,
     SayListIntentHandler,
     SayRecommendedChannelsHandler,
-    SaySearchResultIntentHandler,
+    SearchIntentHandler,
     PlayChannelIntentHandler,
     PlayEpisodeIntentHandler,
-    PlayPromotionEpisodesIntentHandler,
+    PlayFeaturedEpisodesIntentHandler,
     StartPlaybackHandler,
     NextPlaybackHandler,
     PreviousPlaybackHandler,

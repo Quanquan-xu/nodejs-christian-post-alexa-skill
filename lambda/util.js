@@ -23,6 +23,33 @@ localisationClient.localise = function localise() {
     return value;
 };
 
+function editDistance(s1, s2) {
+  s1 = s1.toLowerCase();
+  s2 = s2.toLowerCase();
+
+  var costs = new Array();
+  for (var i = 0; i <= s1.length; i++) {
+    var lastValue = i;
+    for (var j = 0; j <= s2.length; j++) {
+      if (i == 0)
+        costs[j] = j;
+      else {
+        if (j > 0) {
+          var newValue = costs[j - 1];
+          if (s1.charAt(i - 1) != s2.charAt(j - 1))
+            newValue = Math.min(Math.min(newValue, lastValue),
+              costs[j]) + 1;
+          costs[j - 1] = lastValue;
+          lastValue = newValue;
+        }
+      }
+    }
+    if (i > 0)
+      costs[s2.length] = lastValue;
+  }
+  return costs[s2.length];
+}
+
 module.exports = {
     getS3PreSignedUrl(s3ObjectKey) {
         const bucketName = process.env.S3_PERSISTENCE_BUCKET;
@@ -184,9 +211,9 @@ module.exports = {
         cardSubtitle = this.getResponseMessage('LIST_PROMPT_NOTIFICATION_MSG',{name:"episode", number:number});
 
         if(playlist['type'] === 'channel'){
-          message = this.getResponseMessage('LIST_PROMOTION_EPISODES_NOTIFICATION_MSG_FOR_CHANNEL')
+          message = this.getResponseMessage('LIST_PROMOTION_EPISODES_NOTIFICATION_MSG_FOR_CHANNEL',{length:maxLength})
         }else{
-          message = this.getResponseMessage('LIST_PROMOTION_EPISODES_NOTIFICATION_MSG_FOR_EPISODES')
+          message = this.getResponseMessage('LIST_PROMOTION_EPISODES_NOTIFICATION_MSG_FOR_EPISODES',{length:maxLength})
           if(isNotificationFrist){
               message += cardSubtitle;
           }
@@ -231,8 +258,16 @@ module.exports = {
     getResponseMetadata(podcast, playlist, index, sessionCounter){
         const {description,subtitle} = this.getDescriptionSubtitleMessage(podcast, playlist);
         let message = this.getResponseMessage('START_PLAYING_MSG', {description: description});
-        if(index % 5 === 0 && (!sessionCounter || sessionCounter <= 40 || sessionCounter % 7 === 0)){
-            message = message + this.getResponseMessage('START_PLAYING_HELP_MSG')
+        if(index % 5 === 0){
+            if(playlist['type'] === 'episode' && playlist['name'].includes("search")){
+                message = message + this.getResponseMessage('START_PLAYING_HELP_MSG_FOR_EPISODE_SEARCH')
+            }else if(playlist['type'] === 'channel'){
+                message = message + this.getResponseMessage('START_PLAYING_HELP_MSG_FOR_PLAY_CHANNEL_SEARCH', {name: playlist['name']})
+            }else{
+                if(!sessionCounter || sessionCounter <= 40 || sessionCounter % 7 === 0){
+                    message = message + this.getResponseMessage('START_PLAYING_HELP_MSG_IN_SHORT')
+                }
+            }
         }
         const backgroundImage = constants.IMAGES["backgroundImage"]
         const metadata = {
@@ -292,15 +327,64 @@ module.exports = {
         return this.formatResponseBuilder(message, reprompt, message, reprompt, handlerInput);
     },
     formatResponseBuilder(cardTitle,cardSubtitle, message, reprompt, handlerInput){
-        handlerInput.responseBuilder.withStandardCard(
+        handlerInput.responseBuilder.withSimpleCard(
             this.speakSafeText(cardTitle),
-            cardSubtitle,
-            constants.IMAGES.standardCardSmallImageUrl,
-            constants.IMAGES.standardCardLargeImageUrl
+            this.speakSafeText(cardSubtitle)
         );
         return handlerInput.responseBuilder
             .speak(this.speakSafeText(message))
             .reprompt(this.speakSafeText(reprompt))
             .getResponse();
+    },
+    similarity(s1, s2) {
+      var longer = s1;
+      var shorter = s2;
+      if (s1.length < s2.length) {
+        longer = s2;
+        shorter = s1;
+      }
+      var longerLength = longer.length;
+      if (longerLength == 0) {
+        return 1.0;
+      }
+      return (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength);
+    },
+    getSearchConfirmationMessage(handlerInput, init=false){
+        const {searchedChannels,history} = handlerInput.attributesManager.getSessionAttributes();
+        let index = parseInt(history.targetChannel, 10) - 1;
+        const length = searchedChannels.length;
+        if(!init){
+            index = index + 1;
+            history.targetChannel = index + 1;
+        }
+        let message, reprompt;
+        if(index <= length-1){
+            const targetChannel = searchedChannels[index];
+            if( index === 0){
+                message = this.getResponseMessage('CHANNEL_SEARCH_RESULTS_CONFIRMATION_MSG1', {description:targetChannel['title']});
+                reprompt = this.getResponseMessage('CHANNEL_SEARCH_RESULTS_PROMPT_MSG1');
+            }else if (index === 1) {
+                message = this.getResponseMessage('CHANNEL_SEARCH_RESULTS_CONFIRMATION_MSG2', {description:targetChannel['title']});
+                reprompt = this.getResponseMessage('CHANNEL_SEARCH_RESULTS_PROMPT_MSG1');
+            }else if (index === 2) {
+                message = this.getResponseMessage('CHANNEL_SEARCH_RESULTS_CONFIRMATION_MSG3', {description:targetChannel['title']});
+                reprompt = this.getResponseMessage('CHANNEL_SEARCH_RESULTS_PROMPT_MSG1');
+            }else if (index === 3) {
+                let description = "";
+                const number =  length >= 5 ? 2 : (length - index);
+                searchedChannels.slice(index, index + 3).forEach( function(channel, i) {
+                    description += 'Channel ' + (index + i + 1) + " : " + channel.title + ";  "
+                });
+                message = this.getResponseMessage('CHANNEL_SEARCH_RESULTS_CONFIRMATION_MSG4', {number:number, description:description});
+                reprompt = this.getResponseMessage('CHANNEL_SEARCH_RESULTS_PROMPT_MSG2');
+            }else {
+                message = this.getResponseMessage('CHANNEL_SEARCH_RESULTS_CONFIRMATION_MSG5');
+                reprompt = this.getResponseMessage('REPROMPT_MSG');
+            }
+        }else{
+                message = this.getResponseMessage('CHANNEL_SEARCH_RESULTS_CONFIRMATION_MSG5');
+                reprompt = this.getResponseMessage('REPROMPT_MSG');
+        }
+        return this.formatResponseBuilder(message, reprompt, message, reprompt, handlerInput);
     }
 }

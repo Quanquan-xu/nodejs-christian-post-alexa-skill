@@ -13,15 +13,19 @@ const LaunchRequestHandler = {
     return Alexa.getRequestType(handlerInput.requestEnvelope) === 'LaunchRequest';
   },
   async handle(handlerInput) {
-    const {playbackInfo,playlistTokens,playlist,history} = handlerInput.attributesManager.getSessionAttributes();
+    const {playbackInfo,playlistTokens,playlist,history,sessionCounter} = handlerInput.attributesManager.getSessionAttributes();
     let message;
     let reprompt;
-
+    history.targetChannel = 0
     if (!playbackInfo.hasPreviousPlaybackSession || playbackInfo.index < 0) {
         if(playbackInfo.index < 0){
             playbackInfo.index = 0;
         }
-        message = util.getResponseMessage('WELCOME_MSG');
+        if(!sessionCounter){
+            message = util.getResponseMessage('WELCOME_MSG_INIT');
+        }else{
+            message = util.getResponseMessage('WELCOME_MSG');
+        }
         reprompt = util.getResponseMessage('WELCOME_MSG_REPROMPT');
     } else {
         playbackInfo.inPlaybackSession = false;

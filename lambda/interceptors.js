@@ -41,6 +41,7 @@ const LoadAttributesRequestInterceptor = {
                   },
                   history:{
                       resume:false,
+                      targetChannel:0,
                       episodes:{}
                   }
                 }
